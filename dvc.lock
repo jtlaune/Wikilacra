@@ -1,0 +1,15 @@
+schema: '2.0'
+stages:
+  label_data_extract:
+    cmd: python pipelines/label_training_data.py 
+      "inputs/label_data/2025-08.enwiki.2025-08.tsv" 1h 
+      "outputs/label_data/2025-08.enwiki.2025-08.csv"
+    deps:
+    - path: inputs/label_data/2025-08.enwiki.2025-08.tsv
+      hash: md5
+      md5: d29c79b5648885ca11f29af6f6198def
+      size: 3304552022
+    - path: pipelines/label_training_data.py
+      hash: md5
+      md5: 2b551e57bedb5fbb994555ad63611ad7
+      size: 3198
