@@ -1,0 +1,12 @@
+stages:
+  label_data_extract:
+    cmd: python pipelines/label_training_data.py 
+    deps:
+    - "pipelines/label_training_data.py"
+    - "inputs/label_data/MediaWiki History Dumps/${label_data_extract.dumpfile_base}.tsv.bz2"
+    params:
+    - label_data_extract.N_page_entropy
+    - label_data_extract.dumpfile_base
+    - label_data_extract.freq
+    outs:
+    - outputs/label_data/data_to_label.csv

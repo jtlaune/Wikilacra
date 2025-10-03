@@ -1,0 +1,4 @@
+label_data_extract:
+  freq: 1H
+  N_page_entropy: 25
+  dumpfile_base: "2025-08.enwiki.2025-08"
