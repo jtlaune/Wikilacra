@@ -21,6 +21,8 @@ COPY . /app
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app && chown -R appuser /data
 USER appuser
 
+ENV PYTHONPATH=/workspaces/Wikilacra
+
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
 # Just launch a shell for in case no command given...
 CMD ["/bin/bash"]
