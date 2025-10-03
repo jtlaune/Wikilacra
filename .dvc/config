@@ -1,4 +1,6 @@
 [core]
     remote = localdata
+[cache]
+    type = "reflink,hardlink,symlink"
 ['remote "localdata"']
     url = /data
