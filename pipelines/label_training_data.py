@@ -6,7 +6,8 @@ from wikilacra import MEDIAWIKI_HISTOR_DUMP_COL_NAMES
 
 
 def load_and_clean(fn, chunksize=250_000):
-    """Stream and filter the dump to stay within memory limits."""
+    # Stream and filter the dump to stay within memory limits.
+    # Read dump file and retrieve edits.
 
     columns_to_keep = [
         "event_timestamp",
@@ -61,6 +62,8 @@ def load_and_clean(fn, chunksize=250_000):
 
 
 def bin_and_count(revisions, freq):
+    # Bin number of edits by hour and compute number of unique users
+    # editing the page during that window.
     counts = (
         revisions[revisions.event_user_id.notna()]
         .groupby([pd.Grouper(key="event_timestamp", freq=freq), "page_id"])
@@ -88,16 +91,21 @@ def bin_and_count(revisions, freq):
 
 
 def filter_for_manual_labeling(counts):
+    # In future should parameterize this and treat as a hyperparameter
     return counts[(counts.num_unique_users > 1) & (counts.revision_count >= 15)]
 
 
 def generate_url(counts):
-    counts["page_url"] = "https://en.wikipedia.org/wiki/" + counts["page_title"].astype(
-        str
+    # Generate history link for easy labeling
+    counts["page_url"] = (
+        "https://en.wikipedia.org/w/index.php?title="
+        + counts["page_title"].astype(str)
+        + "&action=history&offset=&limit=500"
     )
 
 
 if __name__ == "__main__":
+    # Call from a DVC stage.
     filepath = sys.argv[1]
     freq = sys.argv[2]
     outpath = sys.argv[3]
