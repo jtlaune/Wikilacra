@@ -27,5 +27,6 @@ LICENSE
 README.md
 **/.dvc/cache/
 **/*.tsv
+**/*.csv
 **/*.bz2
 !**/*.dvc

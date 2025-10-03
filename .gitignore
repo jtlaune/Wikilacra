@@ -213,3 +213,6 @@ __marimo__/
 
 # macos
 .DS_Store
+
+# Data files
+*.csv
