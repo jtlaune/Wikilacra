@@ -11,8 +11,8 @@ stages:
       size: 3304552022
     - path: pipelines/label_training_data.py
       hash: md5
-      md5: 7d43373eb2aaa116b22689e1e170c621
-      size: 1376
+      md5: bcec0e35572ac000a313927a5cc8559b
+      size: 1443
     outs:
     - path: outputs/label_data/2025-08.enwiki.2025-08.csv
       hash: md5

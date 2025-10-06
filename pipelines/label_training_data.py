@@ -4,21 +4,7 @@ from wikilacra import MEDIAWIKI_HISTOR_DUMP_COL_NAMES
 from wikilacra.stream import bin_and_count, read_data_chunked
 
 
-def load_and_clean(fn):
-
-    columns_to_keep = [
-        "event_timestamp",
-        "page_title",
-        "event_user_id",
-        "page_id",
-        "page_is_deleted",
-    ]
-    columns_to_read = [
-        "event_entity",
-        "page_namespace",
-        *columns_to_keep,
-    ]
-
+def load_and_clean(fn, columns_to_keep, columns_to_read):
     revisions = read_data_chunked(fn, columns_to_keep, columns_to_read)
     revisions = revisions[revisions["event_user_id"].notna()]
     return revisions
@@ -44,7 +30,20 @@ if __name__ == "__main__":
     freq = sys.argv[2]
     outpath = sys.argv[3]
 
-    revisions = load_and_clean(filepath)
+    columns_to_keep = [
+        "event_timestamp",
+        "page_title",
+        "event_user_id",
+        "page_id",
+        "page_is_deleted",
+    ]
+    columns_to_read = [
+        "event_entity",
+        "page_namespace",
+        *columns_to_keep,
+    ]
+
+    revisions = load_and_clean(filepath, columns_to_keep, columns_to_read)
     counts = bin_and_count(revisions, freq)
     generate_url(counts)
     filtered_counts = filter_for_manual_labeling(counts)
