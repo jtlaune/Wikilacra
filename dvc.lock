@@ -13,3 +13,8 @@ stages:
       hash: md5
       md5: 3eb07ffadf502609a9a259d03329e72f
       size: 3562
+    outs:
+    - path: outputs/label_data/2025-08.enwiki.2025-08.csv
+      hash: md5
+      md5: 4e17751a4de7fc97871d46ff70777268
+      size: 127266
