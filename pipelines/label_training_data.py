@@ -1,12 +1,10 @@
 import sys
 import pandas as pd
 from wikilacra import MEDIAWIKI_HISTOR_DUMP_COL_NAMES
-from wikilacra.stream import bin_and_count
+from wikilacra.stream import bin_and_count, read_data_chunked
 
 
-def load_and_clean(fn, chunksize=250_000):
-    """Stream and filter the dump to stay within memory limits.
-    Read dump file and retrieve edits."""
+def load_and_clean(fn):
 
     columns_to_keep = [
         "event_timestamp",
@@ -21,42 +19,8 @@ def load_and_clean(fn, chunksize=250_000):
         *columns_to_keep,
     ]
 
-    read_csv_kwargs = dict(
-        sep="	",
-        names=MEDIAWIKI_HISTOR_DUMP_COL_NAMES,
-        header=None,
-        usecols=columns_to_read,
-        on_bad_lines="warn",
-        parse_dates=["event_timestamp"],
-    )
-
-    if chunksize:
-        reader = pd.read_csv(fn, chunksize=chunksize, **read_csv_kwargs)
-    else:
-        reader = [pd.read_csv(fn, **read_csv_kwargs)]
-
-    filtered_chunks = []
-
-    for chunk in reader:
-        title = chunk["page_title"]
-        mask = chunk["event_entity"].eq("revision") & chunk["page_namespace"].eq(0)
-        mask &= ~title.str.contains(r"/sandbox", na=False)
-        mask &= ~title.str.fullmatch(r"Sandbox", na=False)
-        mask &= ~title.str.fullmatch(r"Undefined/junk", na=False)
-        mask &= ~title.str.fullmatch(r"Wiki", na=False)
-        mask &= chunk["event_user_id"].notna()
-
-        filtered = chunk.loc[mask, columns_to_keep]
-        if not filtered.empty:
-            filtered_chunks.append(filtered)
-
-    if filtered_chunks:
-        revisions = pd.concat(filtered_chunks, ignore_index=True)
-    else:
-        revisions = pd.DataFrame(columns=columns_to_keep).astype(
-            {"event_timestamp": "datetime64[ns]"}
-        )
-
+    revisions = read_data_chunked(fn, columns_to_keep, columns_to_read)
+    revisions = revisions[revisions["event_user_id"].notna()]
     return revisions
 
 
