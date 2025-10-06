@@ -1,13 +1,12 @@
 import sys
-import numpy as np
 import pandas as pd
-import plotly.express as px
 from wikilacra import MEDIAWIKI_HISTOR_DUMP_COL_NAMES
+from wikilacra.stream import bin_and_count
 
 
 def load_and_clean(fn, chunksize=250_000):
-    # Stream and filter the dump to stay within memory limits.
-    # Read dump file and retrieve edits.
+    """Stream and filter the dump to stay within memory limits.
+    Read dump file and retrieve edits."""
 
     columns_to_keep = [
         "event_timestamp",
@@ -61,42 +60,13 @@ def load_and_clean(fn, chunksize=250_000):
     return revisions
 
 
-def bin_and_count(revisions, freq):
-    # Bin number of edits by hour and compute number of unique users
-    # editing the page during that window.
-    counts = (
-        revisions[revisions.event_user_id.notna()]
-        .groupby([pd.Grouper(key="event_timestamp", freq=freq), "page_id"])
-        .agg(
-            revision_count=("event_timestamp", "size"),
-            page_title=("page_title", "first"),
-            page_is_deleted=("page_is_deleted", "last"),
-        )
-        .reset_index()
-    )
-    user_counts = (
-        revisions[revisions.event_user_id.notna()]
-        .groupby(
-            [pd.Grouper(key="event_timestamp", freq=freq), "page_id", "event_user_id"]
-        )
-        .agg(user_counts=("event_timestamp", "size"))
-    ).reset_index()
-    user_counts = (
-        user_counts.groupby(["event_timestamp", "page_id"])
-        .agg(num_unique_users=("event_timestamp", "size"))
-        .reset_index()
-    )
-    counts = counts.merge(user_counts, on=["event_timestamp", "page_id"])
-    return counts
-
-
 def filter_for_manual_labeling(counts):
-    # In future should parameterize this and treat as a hyperparameter
+    """In future should parameterize this and treat as a hyperparameter"""
     return counts[(counts.num_unique_users > 1) & (counts.revision_count >= 15)]
 
 
 def generate_url(counts):
-    # Generate history link for easy labeling
+    """Generate history link for easy labeling"""
     counts["page_url"] = (
         "https://en.wikipedia.org/w/index.php?title="
         + counts["page_title"].astype(str)
