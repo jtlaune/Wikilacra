@@ -2,7 +2,9 @@ import pandas as pd
 from wikilacra import MEDIAWIKI_HISTOR_DUMP_COL_NAMES
 
 
-def read_data_chunked(fn, columns_to_keep, columns_to_read, chunksize=250_000):
+def read_data_chunked(
+    fn, columns_to_keep, columns_to_read, edit_type="revision", chunksize=250_000
+):
     """Stream and filter the dump to stay within memory limits. Read dump file
     and retrieve edits."""
 
@@ -24,7 +26,7 @@ def read_data_chunked(fn, columns_to_keep, columns_to_read, chunksize=250_000):
 
     for chunk in reader:
         title = chunk["page_title"]
-        mask = chunk["event_entity"].eq("revision") & chunk["page_namespace"].eq(0)
+        mask = chunk["event_entity"].eq(edit_type) & chunk["page_namespace"].eq(0)
         mask &= ~title.str.contains(r"/sandbox", na=False)
         mask &= ~title.str.fullmatch(r"Sandbox", na=False)
         mask &= ~title.str.fullmatch(r"Undefined/junk", na=False)
