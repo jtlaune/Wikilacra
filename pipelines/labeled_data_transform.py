@@ -253,4 +253,7 @@ if __name__ == "__main__":
             **colnames,
         )
 
+    # TODO: figure out where these come from
+    labels = labels.drop(columns=["Unnamed: 11", "Unnamed: 12", "EVENTS:", "367"])
+
     labels.to_csv(output_path)
