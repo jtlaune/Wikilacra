@@ -1,3 +1,10 @@
+"""
+Module of helper functions for the WikiMedia History dump files.
+
+read_data_chunked: read large dump file chunked
+bin_and_count: bin the revisions by frequency
+
+"""
 import pandas as pd
 from wikilacra import MEDIAWIKI_HISTOR_DUMP_COL_NAMES
 
