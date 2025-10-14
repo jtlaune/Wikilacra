@@ -11,10 +11,35 @@ stages:
       size: 3304552022
     - path: pipelines/label_training_data.py
       hash: md5
-      md5: 7dc6f58f36c98bdb8b989253a28a17f9
-      size: 2544
+      md5: bcec0e35572ac000a313927a5cc8559b
+      size: 1443
     outs:
     - path: outputs/label_data/2025-08.enwiki.2025-08.csv
       hash: md5
       md5: 4e17751a4de7fc97871d46ff70777268
       size: 127266
+  labeled_data_transform:
+    cmd: python pipelines/labeled_data_transform.py 6 
+      "inputs/label_data/2025-08.enwiki.2025-08.tsv" 
+      "inputs/labeled_data/25-08-enwiki-25-08 data annotation - 8-1 through 
+      8-31.csv" "2025-08-01 00:00:00" "1h" 
+      "outputs/labeled_transformed/labels_aug25.csv"
+    deps:
+    - path: inputs/label_data/2025-08.enwiki.2025-08.tsv
+      hash: md5
+      md5: d29c79b5648885ca11f29af6f6198def
+      size: 3304552022
+    - path: inputs/labeled_data/25-08-enwiki-25-08 data annotation - 8-1 through
+        8-31.csv
+      hash: md5
+      md5: 87f54ae38e3c16beac7900c4ccac6883
+      size: 140642
+    - path: pipelines/labeled_data_transform.py
+      hash: md5
+      md5: 86a71061220de4dd20c824626e5deef7
+      size: 8300
+    outs:
+    - path: outputs/labeled_transformed/labels_aug25.csv
+      hash: md5
+      md5: 7ae9489bd4d688accae5adaafd3179d5
+      size: 229463

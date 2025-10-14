@@ -11,3 +11,17 @@ stages:
       - "inputs/label_data/${label_data_extract.basename}.tsv" 
     outs:
       - "outputs/label_data/${label_data_extract.basename}.csv"
+  labeled_data_transform:
+    cmd: python pipelines/labeled_data_transform.py 
+      ${labeled_data_transform.rolling_avg_hrs} 
+      "inputs/label_data/${labeled_data_transform.revisions_basename}.tsv"
+      "inputs/labeled_data/${labeled_data_transform.labeled_basename}.csv" 
+      "${labeled_data_transform.start_dt}"
+      "${labeled_data_transform.freq}"
+      "outputs/labeled_transformed/${labeled_data_transform.outname}.csv"
+    deps:
+      - "pipelines/labeled_data_transform.py"
+      - "inputs/label_data/${labeled_data_transform.revisions_basename}.tsv"
+      - "inputs/labeled_data/${labeled_data_transform.labeled_basename}.csv" 
+    outs:
+    - "outputs/labeled_transformed/${labeled_data_transform.outname}.csv"
