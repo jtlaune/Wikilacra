@@ -25,3 +25,7 @@ stages:
       - "inputs/labeled_data/${labeled_data_transform.labeled_basename}.csv" 
     outs:
     - "outputs/labeled_transformed/${labeled_data_transform.outname}.csv"
+  train-RF:
+    cmd: python pipelines/clean.py
+    deps:
+    outs:
