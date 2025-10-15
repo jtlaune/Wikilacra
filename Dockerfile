@@ -13,6 +13,7 @@ ENV PYTHONUNBUFFERED=1
 COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
 RUN python -m pip install dvc pylint docformatter
+RUN python -m pip install dvclive[image,plots,sklearn,markdown,torch]
 
 WORKDIR /app
 COPY . /app
