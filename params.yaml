@@ -11,7 +11,7 @@ labeled_data_transform:
 train-RF:
   metric_name: "f1"
   random_state: 42
-  shuffle: True
+  shuffle: 1
   n_jobs: 2
   max_depths_gen: 0
   max_depths: (1,2,3,4,5)

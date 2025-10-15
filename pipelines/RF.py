@@ -16,7 +16,12 @@ if __name__ == "__main__":
     labels_fp = sys.argv[1]
     metric_name = sys.argv[2]  # precision, recall, fpr, tpr, f1
     random_state = int(sys.argv[3])
-    shuffle = bool(sys.argv[4])  # shuffle data during cross validation
+    shuffle = int(sys.argv[4])  # shuffle data during cross validation
+    if shuffle: 
+        shuffle = True
+    else:
+        shuffle = False
+
     n_jobs = int(sys.argv[5])
 
     # generate the max_depths grid? determines format of next argument
