@@ -1,5 +1,6 @@
 params:
 - params.yaml
+- dvclive/params.yaml
 stages:
   label_data_extract:
     cmd: python pipelines/label_training_data.py 
@@ -39,4 +40,6 @@ stages:
 metrics:
 - dvclive/metrics.json
 plots:
+- dvclive/plots/metrics:
+    x: step
 - dvclive/plots/images
