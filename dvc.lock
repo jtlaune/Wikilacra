@@ -45,7 +45,7 @@ stages:
       size: 226533
   train-RF:
     cmd: python pipelines/RF.py "outputs/labeled_transformed/labels_aug25.csv" 
-      precision 42 true 2 0 "(1,2,3,4,5)" 0 "(50,100)" 0.2 5
+      f1 42 1 2 0 "(1,2,3,4,5)" 0 "(50,100)" 0.2 5
     deps:
     - path: outputs/labeled_transformed/labels_aug25.csv
       hash: md5
@@ -53,11 +53,11 @@ stages:
       size: 226533
     - path: pipelines/RF.py
       hash: md5
-      md5: 31c4ee07fe4d90e49213589cef3b1d2c
-      size: 2870
+      md5: c86ee0e81cf30bd8412ee66d77394dfc
+      size: 2924
     outs:
     - path: dvclive/
       hash: md5
-      md5: 1af1934409ec7a0aac71671c2bbf2d8e.dir
-      size: 15688
+      md5: 47508f8c48001b78d0a96fa2dd4f2277.dir
+      size: 17037
       nfiles: 5
