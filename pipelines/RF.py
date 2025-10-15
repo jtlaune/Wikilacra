@@ -13,7 +13,6 @@ from wikilacra.data import (
 )
 
 if __name__ == "__main__":
-    print(sys.argv)
     labels_fp = sys.argv[1]
     metric_name = sys.argv[2]  # precision, recall, fpr, tpr, f1
     random_state = int(sys.argv[3])
@@ -76,4 +75,7 @@ if __name__ == "__main__":
 
     with Live() as live:
         live.log_image("ConfusionMatrixDisplay.png", fCMD)
+        live.log_params(clf.best_params_)
         live.log_metric(f"test/{metric_name}", clf.score(X_test, y_test))
+        live.log_metric(f"cross_val/{metric_name}", clf.best_score_)
+
