@@ -8,3 +8,15 @@ labeled_data_transform:
   start_dt: "2025-08-01 00:00:00"
   freq: 1h
   outname: "labels_aug25"
+train-RF:
+  metric_name: "f1"
+  random_state: 42
+  shuffle: True
+  n_jobs: 2
+  max_depths_gen: 0
+  max_depths: (1,2,3,4,5)
+  n_estimators_gen: 0
+  n_estimators: (50,100)
+  test_prop: 0.2
+  K_fold_cv: 5
+

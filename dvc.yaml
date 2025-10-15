@@ -1,31 +1,42 @@
 params:
-  - params.yaml
+- params.yaml
 stages:
   label_data_extract:
-    cmd: python pipelines/label_training_data.py
+    cmd: python pipelines/label_training_data.py 
       "inputs/label_data/${label_data_extract.basename}.tsv" 
-      ${label_data_extract.freq}
+      ${label_data_extract.freq} 
       "outputs/label_data/${label_data_extract.basename}.csv"
     deps:
-      - "pipelines/label_training_data.py"
-      - "inputs/label_data/${label_data_extract.basename}.tsv" 
+    - pipelines/label_training_data.py
+    - inputs/label_data/${label_data_extract.basename}.tsv
     outs:
-      - "outputs/label_data/${label_data_extract.basename}.csv"
+    - outputs/label_data/${label_data_extract.basename}.csv
   labeled_data_transform:
     cmd: python pipelines/labeled_data_transform.py 
       ${labeled_data_transform.rolling_avg_hrs} 
-      "inputs/label_data/${labeled_data_transform.revisions_basename}.tsv"
+      "inputs/label_data/${labeled_data_transform.revisions_basename}.tsv" 
       "inputs/labeled_data/${labeled_data_transform.labeled_basename}.csv" 
-      "${labeled_data_transform.start_dt}"
-      "${labeled_data_transform.freq}"
+      "${labeled_data_transform.start_dt}" "${labeled_data_transform.freq}" 
       "outputs/labeled_transformed/${labeled_data_transform.outname}.csv"
     deps:
-      - "pipelines/labeled_data_transform.py"
-      - "inputs/label_data/${labeled_data_transform.revisions_basename}.tsv"
-      - "inputs/labeled_data/${labeled_data_transform.labeled_basename}.csv" 
+    - pipelines/labeled_data_transform.py
+    - inputs/label_data/${labeled_data_transform.revisions_basename}.tsv
+    - inputs/labeled_data/${labeled_data_transform.labeled_basename}.csv
     outs:
-    - "outputs/labeled_transformed/${labeled_data_transform.outname}.csv"
+    - outputs/labeled_transformed/${labeled_data_transform.outname}.csv
   train-RF:
-    cmd: python pipelines/clean.py
+    cmd: python pipelines/RF.py 
+      "outputs/labeled_transformed/${labeled_data_transform.outname}.csv" 
+      ${train-RF.metric_name} ${train-RF.random_state} ${train-RF.shuffle} 
+      ${train-RF.n_jobs} ${train-RF.max_depths_gen} "${train-RF.max_depths}" 
+      ${train-RF.n_estimators_gen} "${train-RF.n_estimators}" 
+      ${train-RF.test_prop} ${train-RF.K_fold_cv}
     deps:
-    outs:
+    - pipelines/RF.py
+    - outputs/labeled_transformed/${labeled_data_transform.outname}.csv
+metrics:
+- dvclive/metrics.json
+plots:
+- dvclive/plots/metrics:
+    x: step
+- dvclive/plots/images

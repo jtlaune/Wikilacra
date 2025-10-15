@@ -7,7 +7,7 @@ engineer_common_training: engineer common features, e.g. taking the logarithm of
                           page share
 """
 
-from numpy import log
+from numpy import log, linspace, geomspace
 from sklearn.model_selection import train_test_split
 
 
@@ -26,13 +26,15 @@ def clean_for_training(df):
 
     X = df.drop(
         columns=[
-            "page_share_cur",
             "page_id",
             "SECOND_CLASS",
             "COMMENT",
             "page_is_deleted",
             "page_url",
             "event_timestamp",
+            "page_share_cur",
+            "page_title",
+            "Category",
         ]
     )
     y = X["target"]
@@ -50,7 +52,6 @@ def engineer_common_training(df):
         DataFrame: The transformed training data (in place).
     """
     df["log_page_share_cur"] = log(df["page_share_cur"])
-    df.drop("page_share_cur", inplace=True)
     return df
 
 
@@ -75,3 +76,19 @@ def train_val_test(X, y, val_prop, test_prop, shuffle):
         _X, _y, test_prop / (val_prop + test_prop), shuffle=shuffle
     )
     return X_train, X_val, X_test, y_train, y_val, y_test
+
+
+def create_parameter_grid(x1, x2, n, spacing, dtype):
+    """Create a parameter grid.
+
+    Args:
+        x1: Start value
+        x2: End value
+        n: Number of points
+        spacing: Spacing type, lin or geom
+        dtype: Type of data (e.g., int or float)
+    """
+    if spacing == "geom":
+        return geomspace(x1, x2, n, dtype=dtype)
+    elif spacing == "lin":
+        return linspace(x1, x2, n, dtype=dtype)
