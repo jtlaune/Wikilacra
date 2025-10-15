@@ -1,17 +1,17 @@
 label_data_extract:
   freq: 1h
-  basename: "2025-08.enwiki.2025-08"
+  basename: 2025-08.enwiki.2025-08
 labeled_data_transform:
   rolling_avg_hrs: 6
-  revisions_basename: "2025-08.enwiki.2025-08"
-  labeled_basename: "25-08-enwiki-25-08 data annotation - 8-1 through 8-31"
-  start_dt: "2025-08-01 00:00:00"
+  revisions_basename: 2025-08.enwiki.2025-08
+  labeled_basename: 25-08-enwiki-25-08 data annotation - 8-1 through 8-31
+  start_dt: '2025-08-01 00:00:00'
   freq: 1h
-  outname: "labels_aug25"
+  outname: labels_aug25
 train-RF:
-  metric_name: "f1"
+  metric_name: tpr
   random_state: 42
-  shuffle: True
+  shuffle: true
   n_jobs: 2
   max_depths_gen: 0
   max_depths: (1,2,3,4,5)
