@@ -68,8 +68,8 @@ if __name__ == "__main__":
 
     fCMD = ConfusionMatrixDisplay.from_estimator(
         clf,
-        X,
-        y,
+        X_test,
+        y_test,
         labels=["1", "0"],
         display_labels=["EVENT", "NONE"],
     ).figure_
