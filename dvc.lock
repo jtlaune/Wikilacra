@@ -53,5 +53,11 @@ stages:
       size: 226533
     - path: pipelines/RF.py
       hash: md5
-      md5: 403ded266f9da1f965960e195b0c29e0
-      size: 2748
+      md5: d9e1119ba2143af8bc1ea805e1c99dff
+      size: 2758
+    outs:
+    - path: dvclive/
+      hash: md5
+      md5: 0acc38e6cf24c8799cb8f58489ab72ac.dir
+      size: 16203
+      nfiles: 3
