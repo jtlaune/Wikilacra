@@ -1,6 +1,4 @@
 import sys
-import pandas as pd
-from wikilacra import MEDIAWIKI_HISTOR_DUMP_COL_NAMES
 from wikilacra.stream import bin_and_count, read_data_chunked
 
 
