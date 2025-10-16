@@ -86,5 +86,8 @@ if __name__ == "__main__":
     with Live() as live:
         live.log_image("ConfusionMatrixDisplay.png", fCMD)
         live.log_params(clf.best_params_)
-        live.log_metric(f"test/{metric_name}", clf.score(X_test, y_test))
         live.log_metric(f"cross_val/{metric_name}", clf.best_score_)
+        for metric_name, scorer in scoring.items():
+            live.log_metric(
+                f"test/{metric_name}", scorer(clf, X_test, y_test)
+            )
