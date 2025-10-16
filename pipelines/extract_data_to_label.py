@@ -29,6 +29,7 @@ if __name__ == "__main__":
     filepath = sys.argv[1]
     freq = sys.argv[2]
     outpath = sys.argv[3]
+    counts_outpath = sys.argv[4]
 
     columns_to_keep = [
         "event_timestamp",
@@ -47,4 +48,5 @@ if __name__ == "__main__":
     counts = bin_and_count(revisions, freq)
     generate_url(counts)
     filtered_counts = filter_for_manual_labeling(counts)
+    counts.to_csv(counts_outpath)
     filtered_counts.to_csv(outpath)

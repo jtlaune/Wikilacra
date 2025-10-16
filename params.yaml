@@ -1,6 +1,7 @@
 label_data_extract:
   freq: 1h
   basename: 2025-08.enwiki.2025-08
+  counts_outname: counts_2025-08.enwiki.2025-08
 labeled_data_transform:
   rolling_avg_hrs: 6
   revisions_basename: 2025-08.enwiki.2025-08

@@ -3,15 +3,17 @@ params:
 - dvclive/params.yaml
 stages:
   label_data_extract:
-    cmd: python pipelines/label_training_data.py 
+    cmd: python pipelines/extract_data_to_label.py 
       "inputs/label_data/${label_data_extract.basename}.tsv" 
       ${label_data_extract.freq} 
       "outputs/label_data/${label_data_extract.basename}.csv"
+      "outputs/${label_data_extract.counts_outname}.csv"
     deps:
-    - pipelines/label_training_data.py
+    - pipelines/extract_data_to_label.py
     - inputs/label_data/${label_data_extract.basename}.tsv
     outs:
     - outputs/label_data/${label_data_extract.basename}.csv
+    - outputs/${label_data_extract.counts_outname}.csv
   labeled_data_transform:
     cmd: python pipelines/labeled_data_transform.py 
       ${labeled_data_transform.rolling_avg_hrs} 
