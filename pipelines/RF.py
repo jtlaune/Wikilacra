@@ -75,19 +75,10 @@ if __name__ == "__main__":
     )
     clf.fit(X, y)
 
-    fCMD = ConfusionMatrixDisplay.from_estimator(
-        clf,
-        X_test,
-        y_test,
-        labels=["1", "0"],
-        display_labels=["EVENT", "NONE"],
-    ).figure_
-
     cv_results = pd.DataFrame(clf.cv_results_)
     best = cv_results.loc[cv_results["rank_test_f1"] == 1].squeeze()
 
     with Live() as live:
-        live.log_image("ConfusionMatrixDisplay.png", fCMD)
         live.log_params(clf.best_params_)
         
         for metric_name in scoring.keys():

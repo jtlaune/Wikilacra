@@ -48,7 +48,7 @@ stages:
       size: 136575
   train-RF:
     cmd: python pipelines/RF.py "outputs/labeled_transformed/labels_aug25.csv" 
-      precision 42 1 2 0 "(1,2,3,4,5)" 0 "(50,100)" 0.2 5
+      tpr 42 1 2 0 "(1,2,3,4,5)" 0 "(50,100)" 0.2 5
     deps:
     - path: outputs/labeled_transformed/labels_aug25.csv
       hash: md5
@@ -56,8 +56,8 @@ stages:
       size: 226533
     - path: pipelines/RF.py
       hash: md5
-      md5: 3a5eb44428b445a78d8abb5008c2e406
-      size: 3257
+      md5: f672e9b55a04a04c507a15b444dff23c
+      size: 3019
     - path: wikilacra/data.py
       hash: md5
       md5: 27aee338a956c9169c4f7585a11f937d
@@ -69,9 +69,9 @@ stages:
     outs:
     - path: dvclive/
       hash: md5
-      md5: cb4ebedf0813704d721db7ab814763fd.dir
-      size: 15404
-      nfiles: 13
+      md5: df18c1df3076bda02152ec2ab2fbd2f9.dir
+      size: 797
+      nfiles: 12
   features:
     cmd: python pipelines/engineer-features.py 6 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 
