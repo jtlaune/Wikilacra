@@ -8,16 +8,16 @@ from sklearn.model_selection import GridSearchCV, KFold, train_test_split
 from wikilacra.scoring import scoring
 from wikilacra.data import (
     clean_for_training,
-    engineer_common_training,
     create_parameter_grid,
 )
+from wikilacra.features import engineer_common_training
 
 if __name__ == "__main__":
     labels_fp = sys.argv[1]
     metric_name = sys.argv[2]  # precision, recall, fpr, tpr, f1
     random_state = int(sys.argv[3])
     shuffle = int(sys.argv[4])  # shuffle data during cross validation
-    if shuffle: 
+    if shuffle:
         shuffle = True
     else:
         shuffle = False
@@ -66,7 +66,12 @@ if __name__ == "__main__":
     }
     cv_splitter = KFold(n_splits=K_fold_cv, shuffle=shuffle, random_state=random_state)
     clf = GridSearchCV(
-        rf, parameters, n_jobs=n_jobs, cv=cv_splitter, refit=metric_name, scoring=scoring
+        rf,
+        parameters,
+        n_jobs=n_jobs,
+        cv=cv_splitter,
+        refit=metric_name,
+        scoring=scoring,
     )
     clf.fit(X, y)
 
@@ -83,4 +88,3 @@ if __name__ == "__main__":
         live.log_params(clf.best_params_)
         live.log_metric(f"test/{metric_name}", clf.score(X_test, y_test))
         live.log_metric(f"cross_val/{metric_name}", clf.best_score_)
-
