@@ -10,7 +10,7 @@ labeled_data_transform:
 features:
   outname: labels_aug25
 train-RF:
-  metric_name: recall
+  metric_name: precision
   random_state: 42
   shuffle: 1
   n_jobs: 2

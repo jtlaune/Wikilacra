@@ -83,11 +83,15 @@ if __name__ == "__main__":
         display_labels=["EVENT", "NONE"],
     ).figure_
 
+    cv_results = pd.DataFrame(clf.cv_results_)
+    best = cv_results.loc[cv_results["rank_test_f1"] == 1].squeeze()
+
     with Live() as live:
         live.log_image("ConfusionMatrixDisplay.png", fCMD)
         live.log_params(clf.best_params_)
-        live.log_metric(f"cross_val/{metric_name}", clf.best_score_)
-        for metric_name, scorer in scoring.items():
-            live.log_metric(
-                f"test/{metric_name}", scorer(clf, X_test, y_test)
-            )
+        
+        for metric_name in scoring.keys():
+            mean = float(best[f"mean_test_{metric_name}"])
+            std = float(best[f"std_test_{metric_name}"])
+            live.log_metric(f"cross_val/{metric_name}", mean)
+            live.log_metric(f"cross_val/{metric_name}-std", std)
