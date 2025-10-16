@@ -1,19 +1,24 @@
 schema: '2.0'
 stages:
   label_data_extract:
-    cmd: python pipelines/label_training_data.py 
+    cmd: python pipelines/extract_data_to_label.py 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 1h 
-      "outputs/label_data/2025-08.enwiki.2025-08.csv"
+      "outputs/label_data/2025-08.enwiki.2025-08.csv" 
+      "outputs/counts_2025-08.enwiki.2025-08.csv"
     deps:
     - path: inputs/label_data/2025-08.enwiki.2025-08.tsv
       hash: md5
       md5: d29c79b5648885ca11f29af6f6198def
       size: 3304552022
-    - path: pipelines/label_training_data.py
+    - path: pipelines/extract_data_to_label.py
       hash: md5
-      md5: bcec0e35572ac000a313927a5cc8559b
-      size: 1443
+      md5: 0f474c4b107397d0b73e0b9b60f97c6e
+      size: 1510
     outs:
+    - path: outputs/counts_2025-08.enwiki.2025-08.csv
+      hash: md5
+      md5: 07c0d6341845ea035f155b6285b03a31
+      size: 366322900
     - path: outputs/label_data/2025-08.enwiki.2025-08.csv
       hash: md5
       md5: 4e17751a4de7fc97871d46ff70777268
