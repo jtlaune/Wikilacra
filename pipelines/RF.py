@@ -57,7 +57,9 @@ if __name__ == "__main__":
     labels = engineer_common_training(labels)
     X, y = clean_for_training(labels)
 
-    X, X_test, y, y_test = train_test_split(X, y, test_size=test_prop, shuffle=shuffle)
+    X, X_test, y, y_test = train_test_split(
+        X, y, test_size=test_prop, shuffle=shuffle, random_state=random_state
+    )
 
     rf = RandomForestClassifier(random_state=random_state)
     parameters = {
@@ -80,7 +82,7 @@ if __name__ == "__main__":
 
     with Live() as live:
         live.log_params(clf.best_params_)
-        
+
         for metric_name in scoring.keys():
             mean = float(best[f"mean_test_{metric_name}"])
             std = float(best[f"std_test_{metric_name}"])
