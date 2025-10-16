@@ -78,13 +78,13 @@ if __name__ == "__main__":
     clf.fit(X, y)
 
     cv_results = pd.DataFrame(clf.cv_results_)
-    best = cv_results.loc[cv_results["rank_test_f1"] == 1].squeeze()
 
     with Live() as live:
         live.log_params(clf.best_params_)
+        best = cv_results.loc[cv_results[f"rank_test_{metric_name}"] == 1].squeeze()
 
-        for metric_name in scoring.keys():
-            mean = float(best[f"mean_test_{metric_name}"])
-            std = float(best[f"std_test_{metric_name}"])
-            live.log_metric(f"cross_val/{metric_name}", mean)
-            live.log_metric(f"cross_val/{metric_name}-std", std)
+        for _metric in scoring.keys():
+            mean = float(best[f"mean_test_{_metric}"])
+            std = float(best[f"std_test_{_metric}"])
+            live.log_metric(f"cross_val/{_metric}", mean)
+            live.log_metric(f"cross_val/{_metric}-std", std)
