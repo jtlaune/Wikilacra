@@ -12,8 +12,12 @@ stages:
       size: 3304552022
     - path: pipelines/extract_data_to_label.py
       hash: md5
-      md5: 0f474c4b107397d0b73e0b9b60f97c6e
-      size: 1510
+      md5: df461a003dd7966dc679bdb2e8fa23c7
+      size: 1436
+    - path: wikilacra/stream.py
+      hash: md5
+      md5: 830e410d05cbe03911ce279e8e568818
+      size: 3024
     outs:
     - path: outputs/counts_2025-08.enwiki.2025-08.csv
       hash: md5
@@ -54,11 +58,19 @@ stages:
       hash: md5
       md5: 019715a2063ed8dfd29931c7197e1a49
       size: 2989
+    - path: wikilacra/data.py
+      hash: md5
+      md5: 27aee338a956c9169c4f7585a11f937d
+      size: 2341
+    - path: wikilacra/scoring.py
+      hash: md5
+      md5: 18667fb7a367fa98851f1362d9434f7b
+      size: 945
     outs:
     - path: dvclive/
       hash: md5
-      md5: 7152816e84cb69d78a559965dd7a2ea6.dir
-      size: 16517
+      md5: edcae3c53745af380782e7a3a23bd10e.dir
+      size: 16845
       nfiles: 5
   features:
     cmd: python pipelines/engineer-features.py 6 
@@ -83,6 +95,10 @@ stages:
       hash: md5
       md5: 71322aad340db5f9296aff6a19fcd7e0
       size: 1596
+    - path: wikilacra/features.py
+      hash: md5
+      md5: ba6c25feef20440efbc1ffc4601b4b7b
+      size: 6229
     outs:
     - path: outputs/labeled_transformed/labels_aug25.csv
       hash: md5
