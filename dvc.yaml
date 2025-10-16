@@ -11,6 +11,7 @@ stages:
     deps:
     - pipelines/extract_data_to_label.py
     - inputs/label_data/${label_data_extract.basename}.tsv
+    - wikilacra/stream.py
     outs:
     - outputs/label_data/${label_data_extract.basename}.csv
     - outputs/${label_data_extract.counts_outname}.csv
@@ -37,6 +38,7 @@ stages:
     - pipelines/engineer-features.py
     - outputs/labeled_transformed/${labeled_data_transform.outname}.csv
     - outputs/${label_data_extract.counts_outname}.csv
+    - wikilacra/features.py
     outs:
     - outputs/labeled_transformed/${features.outname}.csv
   train-RF:
@@ -49,6 +51,8 @@ stages:
     deps:
     - pipelines/RF.py
     - outputs/labeled_transformed/${features.outname}.csv
+    - wikilacra/scoring.py
+    - wikilacra/data.py
     outs:
     - dvclive/
 metrics:
