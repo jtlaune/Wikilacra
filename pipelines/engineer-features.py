@@ -24,7 +24,7 @@ if __name__ == "__main__":
         "event_timestamp",
         "page_title",
         "event_user_id",
-        "event_user_text",
+        "event_user_text_historical",
         "page_id",
         "page_is_deleted",
         "event_comment",

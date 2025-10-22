@@ -97,7 +97,7 @@ def engineer_features_by_event(
     # Revisions binned by user and hourly timestamp
     binned_filtered = (
         filtered.groupby(
-            [pd.Grouper(key="event_timestamp", freq="h"), "event_user_text"]
+            [pd.Grouper(key="event_timestamp", freq="h"), "event_user_text_historical"]
         )
         .agg(num_edits_by_user=("event_timestamp", "size"))
         .reset_index()
