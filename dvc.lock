@@ -34,18 +34,17 @@ stages:
       size: 199716
   labeled_data_transform:
     cmd: python pipelines/labeled_data_transform.py "2025-08-01 00:00:00" 6 
-      "inputs/labeled_data/25-08-enwiki-25-08 data annotation - 8-1 through 
-      8-31.csv" "outputs/labeled_transformed/labels_only_aug25.csv"
+      "inputs/labeled_data/aug_labeled_v2.csv" 
+      "outputs/labeled_transformed/labels_only_aug25.csv"
     deps:
-    - path: inputs/labeled_data/25-08-enwiki-25-08 data annotation - 8-1 through
-        8-31.csv
+    - path: inputs/labeled_data/aug_labeled_v2.csv
       hash: md5
-      md5: 87f54ae38e3c16beac7900c4ccac6883
-      size: 140642
+      md5: 54ac560de0358bca6958f72c0613ec00
+      size: 137692
     - path: pipelines/labeled_data_transform.py
       hash: md5
-      md5: 60e9ce2a86ffdb6d4e2c3f3cd54bc90a
-      size: 1436
+      md5: ab62a0fcab93c4592c8d400deb405953
+      size: 1308
     outs:
     - path: outputs/labeled_transformed/labels_only_aug25.csv
       hash: md5
