@@ -42,7 +42,5 @@ if __name__ == "__main__":
     non_event = {"EDIT_WAR", "VANDALISM", "NONE", "MOVED_OR_DELETED"}
 
     labels = load_labeled_data(labels_input_file, data_start_dt, rolling_avg_hrs)
-    # TODO: figure out where these come from
-    labels = labels.drop(columns=["Unnamed: 11", "Unnamed: 12", "EVENTS:", "367"])
 
     labels.to_csv(output_path)
