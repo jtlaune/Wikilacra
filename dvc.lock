@@ -3,6 +3,7 @@ stages:
   label_data_extract:
     cmd: python pipelines/extract_data_to_label.py 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 1h 
+      "inputs/labeled_data/aug_labeled_v2.csv" 
       "outputs/label_data/2025-08.enwiki.2025-08.csv" 
       "outputs/counts_2025-08.enwiki.2025-08.csv"
     deps:
@@ -10,23 +11,27 @@ stages:
       hash: md5
       md5: d29c79b5648885ca11f29af6f6198def
       size: 3304552022
+    - path: inputs/labeled_data/aug_labeled_v2.csv
+      hash: md5
+      md5: 87f54ae38e3c16beac7900c4ccac6883
+      size: 140642
     - path: pipelines/extract_data_to_label.py
       hash: md5
-      md5: df461a003dd7966dc679bdb2e8fa23c7
-      size: 1436
+      md5: 68763a8fdd08901779e7d4b8102f1989
+      size: 3236
     - path: wikilacra/stream.py
       hash: md5
-      md5: 830e410d05cbe03911ce279e8e568818
-      size: 3024
+      md5: 7c7562d31c43aa1233976987f13fdaa1
+      size: 2950
     outs:
     - path: outputs/counts_2025-08.enwiki.2025-08.csv
       hash: md5
-      md5: 07c0d6341845ea035f155b6285b03a31
-      size: 366322900
+      md5: a66982a806ee0c73673f8deeb360ce79
+      size: 416860588
     - path: outputs/label_data/2025-08.enwiki.2025-08.csv
       hash: md5
-      md5: 4e17751a4de7fc97871d46ff70777268
-      size: 127266
+      md5: e8af1b861ae41ea7505e3ee04e9b59f3
+      size: 199716
   labeled_data_transform:
     cmd: python pipelines/labeled_data_transform.py "2025-08-01 00:00:00" 6 
       "inputs/labeled_data/25-08-enwiki-25-08 data annotation - 8-1 through 

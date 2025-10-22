@@ -67,8 +67,7 @@ def bin_and_count(stream, freq):
         freq (Timedelta): Timedelta with which to count.
     """
     counts = (
-        stream[stream.event_user_id.notna()]
-        .groupby([pd.Grouper(key="event_timestamp", freq=freq), "page_id"])
+        stream.groupby([pd.Grouper(key="event_timestamp", freq=freq), "page_id"])
         .agg(
             revision_count=("event_timestamp", "size"),
             page_title=("page_title", "first"),
@@ -77,11 +76,9 @@ def bin_and_count(stream, freq):
         .reset_index()
     )
     user_counts = (
-        stream[stream.event_user_id.notna()]
-        .groupby(
-            [pd.Grouper(key="event_timestamp", freq=freq), "page_id", "event_user_id"]
-        )
-        .agg(user_counts=("event_timestamp", "size"))
+        stream.groupby(
+            [pd.Grouper(key="event_timestamp", freq=freq), "page_id", "event_user_text_historical"]
+        ).agg(user_counts=("event_timestamp", "size"))
     ).reset_index()
     user_counts = (
         user_counts.groupby(["event_timestamp", "page_id"])

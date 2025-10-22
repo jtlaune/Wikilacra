@@ -1,10 +1,13 @@
 import sys
 from wikilacra.stream import bin_and_count, read_data_chunked
+from pandas import read_csv, to_datetime
 
 
 def load_and_clean(fn, columns_to_keep, columns_to_read):
     revisions = read_data_chunked(fn, columns_to_keep, columns_to_read)
-    revisions = revisions[revisions["event_user_id"].notna()]
+    revisions["event_user_text_historical"] = revisions[
+        "event_user_text_historical"
+    ].fillna("")
     return revisions
 
 
@@ -26,13 +29,14 @@ if __name__ == "__main__":
     # Call from a DVC stage.
     filepath = sys.argv[1]
     freq = sys.argv[2]
-    outpath = sys.argv[3]
-    counts_outpath = sys.argv[4]
+    pre_labels_path = sys.argv[3]
+    outpath = sys.argv[4]
+    counts_outpath = sys.argv[5]
 
     columns_to_keep = [
         "event_timestamp",
         "page_title",
-        "event_user_id",
+        "event_user_text_historical",
         "page_id",
         "page_is_deleted",
     ]
@@ -41,10 +45,69 @@ if __name__ == "__main__":
         "page_namespace",
         *columns_to_keep,
     ]
+    pre_labels = read_csv(
+        pre_labels_path,
+        index_col=0,
+    )
+    pre_labels["event_timestamp"] = to_datetime(pre_labels["event_timestamp"])
+    labeled_events = set(
+        zip(to_datetime(pre_labels["event_timestamp"]), pre_labels["page_title"])
+    )
 
     revisions = load_and_clean(filepath, columns_to_keep, columns_to_read)
     counts = bin_and_count(revisions, freq)
     generate_url(counts)
     filtered_counts = filter_for_manual_labeling(counts)
+    to_label = set(
+        zip(
+            to_datetime(filtered_counts["event_timestamp"]),
+            filtered_counts["page_title"],
+        )
+    )
+    # Keep only the labels that are in the new extracted data.
+    labeled_events = list(labeled_events.intersection(to_label))
+
+    filtered_counts = filtered_counts.reset_index(names="idx").set_index(
+        ["event_timestamp", "page_title"]
+    )
+    filtered_counts.loc[
+        labeled_events,
+        [
+            "EVENT, EDIT_WAR, VANDALISM, NONE, MOVED_OR_DELETED",
+            "SECOND_CLASS",
+            "COMMENT",
+        ],
+    ] = (
+        pre_labels.reset_index(names="idx")
+        .set_index(["event_timestamp", "page_title"])
+        .loc[
+            labeled_events,
+            [
+                "EVENT, EDIT_WAR, VANDALISM, NONE, MOVED_OR_DELETED",
+                "SECOND_CLASS",
+                "COMMENT",
+            ],
+        ]
+        .values
+    )
+    filtered_counts[
+        [
+            "EVENT, EDIT_WAR, VANDALISM, NONE, MOVED_OR_DELETED",
+            "SECOND_CLASS",
+            "COMMENT",
+        ]
+    ] = filtered_counts[
+        [
+            "EVENT, EDIT_WAR, VANDALISM, NONE, MOVED_OR_DELETED",
+            "SECOND_CLASS",
+            "COMMENT",
+        ]
+    ].fillna(
+        ""
+    )
+
+    filtered_counts = filtered_counts.reset_index().set_index("idx")
+    filtered_counts.index.name = None
+
     counts.to_csv(counts_outpath)
     filtered_counts.to_csv(outpath)
