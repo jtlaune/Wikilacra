@@ -5,7 +5,7 @@ label_data_extract:
   pre_labels: aug_labeled_v2
 labeled_data_transform:
   rolling_avg_hrs: 6
-  labeled_basename: aug_labeled_v2
+  labeled_basename: aug_labeled_v3
   start_dt: '2025-08-01 00:00:00'
   outname: labels_only_aug25
 features:
