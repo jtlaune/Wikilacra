@@ -6,11 +6,13 @@ stages:
     cmd: python pipelines/extract_data_to_label.py 
       "inputs/label_data/${label_data_extract.basename}.tsv" 
       ${label_data_extract.freq} 
+      "inputs/labeled_data/${label_data_extract.pre_labels}.csv"
       "outputs/label_data/${label_data_extract.basename}.csv" 
       "outputs/${label_data_extract.counts_outname}.csv"
     deps:
     - pipelines/extract_data_to_label.py
     - inputs/label_data/${label_data_extract.basename}.tsv
+    - inputs/labeled_data/${label_data_extract.pre_labels}.csv
     - wikilacra/stream.py
     outs:
     - outputs/label_data/${label_data_extract.basename}.csv
