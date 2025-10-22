@@ -77,7 +77,7 @@ def bin_and_count(stream, freq):
     )
     user_counts = (
         stream.groupby(
-            [pd.Grouper(key="event_timestamp", freq=freq), "page_id", "event_user_id"]
+            [pd.Grouper(key="event_timestamp", freq=freq), "page_id", "event_user_text_historical"]
         ).agg(user_counts=("event_timestamp", "size"))
     ).reset_index()
     user_counts = (

@@ -5,7 +5,9 @@ from pandas import read_csv, to_datetime
 
 def load_and_clean(fn, columns_to_keep, columns_to_read):
     revisions = read_data_chunked(fn, columns_to_keep, columns_to_read)
-    revisions["event_user_id"] = revisions["event_user_id"].fillna("")
+    revisions["event_user_text_historical"] = revisions[
+        "event_user_text_historical"
+    ].fillna("")
     return revisions
 
 
@@ -34,7 +36,7 @@ if __name__ == "__main__":
     columns_to_keep = [
         "event_timestamp",
         "page_title",
-        "event_user_id",
+        "event_user_text_historical",
         "page_id",
         "page_is_deleted",
     ]
@@ -47,7 +49,8 @@ if __name__ == "__main__":
         pre_labels_path,
         index_col=0,
     )
-    labeled_events = list(
+    pre_labels["event_timestamp"] = to_datetime(pre_labels["event_timestamp"])
+    labeled_events = set(
         zip(to_datetime(pre_labels["event_timestamp"]), pre_labels["page_title"])
     )
 
@@ -55,6 +58,14 @@ if __name__ == "__main__":
     counts = bin_and_count(revisions, freq)
     generate_url(counts)
     filtered_counts = filter_for_manual_labeling(counts)
+    to_label = set(
+        zip(
+            to_datetime(filtered_counts["event_timestamp"]),
+            filtered_counts["page_title"],
+        )
+    )
+    # Keep only the labels that are in the new extracted data.
+    labeled_events = list(labeled_events.intersection(to_label))
 
     filtered_counts = filtered_counts.reset_index(names="idx").set_index(
         ["event_timestamp", "page_title"]
@@ -66,13 +77,19 @@ if __name__ == "__main__":
             "SECOND_CLASS",
             "COMMENT",
         ],
-    ] = pre_labels[
-        [
-            "EVENT, EDIT_WAR, VANDALISM, NONE, MOVED_OR_DELETED",
-            "SECOND_CLASS",
-            "COMMENT",
+    ] = (
+        pre_labels.reset_index(names="idx")
+        .set_index(["event_timestamp", "page_title"])
+        .loc[
+            labeled_events,
+            [
+                "EVENT, EDIT_WAR, VANDALISM, NONE, MOVED_OR_DELETED",
+                "SECOND_CLASS",
+                "COMMENT",
+            ],
         ]
-    ].values
+        .values
+    )
     filtered_counts[
         [
             "EVENT, EDIT_WAR, VANDALISM, NONE, MOVED_OR_DELETED",
