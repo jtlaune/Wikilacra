@@ -11,10 +11,11 @@ from wikilacra import MEDIAWIKI_HISTOR_DUMP_COL_NAMES
 
 
 def read_data_chunked(
-    fn, columns_to_keep, columns_to_read, edit_type="revision", chunksize=250_000
+    fn, columns_to_keep, columns_to_read, edit_type="revision", chunksize=250_000, page_titles="all"
 ):
     """Stream and filter the dump to stay within memory limits. Read dump file
-    and retrieve edits."""
+    and retrieve edits.
+    """
 
     read_csv_kwargs = dict(
         sep="	",
@@ -39,6 +40,9 @@ def read_data_chunked(
         mask &= ~title.str.fullmatch(r"Sandbox", na=False)
         mask &= ~title.str.fullmatch(r"Undefined/junk", na=False)
         mask &= ~title.str.fullmatch(r"Wiki", na=False)
+        # If page_titles is set, keep only matching
+        if page_titles != "all":
+            mask &= title.isin(page_titles)
 
         filtered = chunk.loc[mask, columns_to_keep]
         if not filtered.empty:
