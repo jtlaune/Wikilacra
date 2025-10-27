@@ -4,7 +4,7 @@ from dvclive import Live
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import ConfusionMatrixDisplay
-from sklearn.model_selection import GridSearchCV, KFold, train_test_split
+from sklearn.model_selection import GridSearchCV, TimeSeriesSplit, train_test_split
 from wikilacra.scoring import scoring
 from wikilacra.data import (
     clean_for_training,
@@ -16,65 +16,60 @@ if __name__ == "__main__":
     labels_fp = sys.argv[1]
     metric_name = sys.argv[2]  # precision, recall, fpr, tpr, f1
     random_state = int(sys.argv[3])
-    shuffle = int(sys.argv[4])  # shuffle data during cross validation
-    if shuffle:
-        shuffle = True
-    else:
-        shuffle = False
 
-    n_jobs = int(sys.argv[5])
+    n_jobs = int(sys.argv[4])
 
     # generate the max_depths grid? determines format of next argument
-    max_depths_gen = int(sys.argv[6])
+    max_depths_gen = int(sys.argv[5])
     if max_depths_gen:
         # grid bounds & number of values to search. Must be a literal tuple
         # e.g., '(1,5,5,"lin")'
-        max_depth1, max_depth2, max_depth_n, max_depth_type = literal_eval(sys.argv[7])
+        max_depth1, max_depth2, max_depth_n, max_depth_type = literal_eval(sys.argv[6])
         max_depths = create_parameter_grid(
             max_depth1, max_depth2, max_depth_n, max_depth_type, int
         )
     else:
-        max_depths = literal_eval(sys.argv[7])
+        max_depths = literal_eval(sys.argv[6])
 
     # generate the n_estimators grid? determines format of next argument
-    n_estimators_gen = int(sys.argv[8])
+    n_estimators_gen = int(sys.argv[7])
     if n_estimators_gen:
         # grid bounds & number of values to search. Must be a literal tuple
         # e.g., '(1,5,5,"lin")'
         n_estimator1, n_estimator2, n_estimator_n, n_estimator_type = literal_eval(
-            sys.argv[9]
+            sys.argv[8]
         )
         n_estimators = create_parameter_grid(
             n_estimator1, n_estimator2, n_estimator_n, n_estimator_type, int
         )
     else:
-        n_estimators = literal_eval(sys.argv[9])
+        n_estimators = literal_eval(sys.argv[8])
 
-    test_prop = float(sys.argv[10])
-    K_fold_cv = int(sys.argv[11])
+    test_prop = float(sys.argv[9])
+    K_fold_cv = int(sys.argv[10])
 
     labels = pd.read_csv(labels_fp)
     labels = engineer_common_training(labels)
     X, y = clean_for_training(labels)
 
-    X, X_test, y, y_test = train_test_split(
-        X, y, test_size=test_prop, shuffle=shuffle, random_state=random_state
-    )
+    X, X_test, y, y_test = train_test_split(X, y, test_size=test_prop, shuffle=False)
 
     rf = RandomForestClassifier(random_state=random_state)
     parameters = {
         "n_estimators": n_estimators,
         "max_depth": max_depths,
     }
-    cv_splitter = KFold(n_splits=K_fold_cv, shuffle=shuffle, random_state=random_state)
+
+    cv_splitter = TimeSeriesSplit(n_splits=5)
     clf = GridSearchCV(
         rf,
         parameters,
         n_jobs=n_jobs,
         cv=cv_splitter,
-        refit=metric_name,
         scoring=scoring,
+        refit=metric_name,
     )
+
     clf.fit(X, y)
 
     cv_results = pd.DataFrame(clf.cv_results_)
