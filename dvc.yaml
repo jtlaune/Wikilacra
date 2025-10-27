@@ -46,8 +46,8 @@ stages:
   train-RF:
     cmd: python pipelines/RF.py 
       "outputs/labeled_transformed/${features.outname}.csv" 
-      ${train-RF.metric_name} ${train-RF.random_state} ${train-RF.shuffle} 
-      ${train-RF.n_jobs} ${train-RF.max_depths_gen} "${train-RF.max_depths}" 
+      ${train-RF.metric_name} ${train-RF.random_state} ${train-RF.n_jobs} 
+      ${train-RF.max_depths_gen} "${train-RF.max_depths}" 
       ${train-RF.n_estimators_gen} "${train-RF.n_estimators}" 
       ${train-RF.test_prop} ${train-RF.K_fold_cv}
     deps:
@@ -57,8 +57,9 @@ stages:
     - wikilacra/data.py
     outs:
     - dvclive/
+metrics:
+- dvclive/metrics.json
 plots:
 - dvclive/plots/metrics:
     x: step
-metrics:
-- dvclive/metrics.json
+- dvclive/plots/images
