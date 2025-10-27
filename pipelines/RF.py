@@ -52,7 +52,7 @@ if __name__ == "__main__":
     test_prop = float(sys.argv[9])
     K_fold_cv = int(sys.argv[10])
 
-    labels = pd.read_csv(labels_fp)
+    labels = pd.read_csv(labels_fp, index_col=0)
     labels = engineer_common_training(labels)
     X, y = clean_for_training(labels)
 
