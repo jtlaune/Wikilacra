@@ -76,6 +76,10 @@ def create_parameter_grid(x1, x2, n, spacing, dtype):
         dtype: Type of data (e.g., int or float)
     """
     if spacing == "geom":
-        return geomspace(x1, x2, n, dtype=dtype)
+        _ = geomspace(x1, x2, n, dtype=dtype)
+        # For dvclive reasons, need to make sure its in a native Python type
+        return [dtype(x) for x in _]
     elif spacing == "lin":
-        return linspace(x1, x2, n, dtype=dtype)
+        _ = linspace(x1, x2, n, dtype=dtype)
+        # For dvclive reasons, need to make sure its in a native Python type
+        return [dtype(x) for x in _]
