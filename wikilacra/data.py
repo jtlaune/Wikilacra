@@ -42,19 +42,6 @@ def clean_for_training(df):
     return X, y
 
 
-def engineer_common_training(df):
-    """Do common transformations on columns, e.g. taking logs.
-
-    Args:
-        df (DataFrame): The training data.
-
-    Returns:
-        DataFrame: The transformed training data (in place).
-    """
-    df["log_page_share_cur"] = log(df["page_share_cur"])
-    return df
-
-
 def train_val_test(X, y, val_prop, test_prop, shuffle):
     """Split the dataset into train, validation, and test sets.
 

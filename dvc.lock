@@ -1,63 +1,110 @@
 schema: '2.0'
 stages:
   label_data_extract:
-    cmd: python pipelines/label_training_data.py 
+    cmd: python pipelines/extract_data_to_label.py 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 1h 
-      "outputs/label_data/2025-08.enwiki.2025-08.csv"
+      "inputs/labeled_data/aug_labeled_v2.csv" 
+      "outputs/label_data/2025-08.enwiki.2025-08.csv" 
+      "outputs/counts_2025-08.enwiki.2025-08.csv"
     deps:
     - path: inputs/label_data/2025-08.enwiki.2025-08.tsv
       hash: md5
       md5: d29c79b5648885ca11f29af6f6198def
       size: 3304552022
-    - path: pipelines/label_training_data.py
+    - path: inputs/labeled_data/aug_labeled_v2.csv
       hash: md5
-      md5: bcec0e35572ac000a313927a5cc8559b
-      size: 1443
+      md5: 54ac560de0358bca6958f72c0613ec00
+      size: 137692
+    - path: pipelines/extract_data_to_label.py
+      hash: md5
+      md5: 68763a8fdd08901779e7d4b8102f1989
+      size: 3236
+    - path: wikilacra/stream.py
+      hash: md5
+      md5: 7c7562d31c43aa1233976987f13fdaa1
+      size: 2950
     outs:
+    - path: outputs/counts_2025-08.enwiki.2025-08.csv
+      hash: md5
+      md5: a66982a806ee0c73673f8deeb360ce79
+      size: 416860588
     - path: outputs/label_data/2025-08.enwiki.2025-08.csv
       hash: md5
-      md5: 4e17751a4de7fc97871d46ff70777268
-      size: 127266
+      md5: e8af1b861ae41ea7505e3ee04e9b59f3
+      size: 199716
   labeled_data_transform:
-    cmd: python pipelines/labeled_data_transform.py 6 
+    cmd: python pipelines/labeled_data_transform.py "2025-08-01 00:00:00" 6 
+      "inputs/labeled_data/aug_labeled_v3.csv" 
+      "outputs/labeled_transformed/labels_only_aug25.csv"
+    deps:
+    - path: inputs/labeled_data/aug_labeled_v3.csv
+      hash: md5
+      md5: f291025d9aa4c27b226641cb57e08ced
+      size: 202664
+    - path: pipelines/labeled_data_transform.py
+      hash: md5
+      md5: ab62a0fcab93c4592c8d400deb405953
+      size: 1308
+    outs:
+    - path: outputs/labeled_transformed/labels_only_aug25.csv
+      hash: md5
+      md5: d2d9862ae9c63aa38d42753ce46e38ce
+      size: 201160
+  train-RF:
+    cmd: python pipelines/RF.py "outputs/labeled_transformed/labels_aug25.csv" 
+      f1 3453 1 2 0 "(1,2,3,4,5)" 0 "(50,100)" 0.2 5
+    deps:
+    - path: outputs/labeled_transformed/labels_aug25.csv
+      hash: md5
+      md5: 5e99920d46df606f9e543e2b7f16e7fb
+      size: 334120
+    - path: pipelines/RF.py
+      hash: md5
+      md5: 9d0efcb37426fc2baa603a73f3a1772d
+      size: 3049
+    - path: wikilacra/data.py
+      hash: md5
+      md5: 27aee338a956c9169c4f7585a11f937d
+      size: 2341
+    - path: wikilacra/scoring.py
+      hash: md5
+      md5: 18667fb7a367fa98851f1362d9434f7b
+      size: 945
+    outs:
+    - path: dvclive/
+      hash: md5
+      md5: e42caf16a265f81ea47d37fb54eca710.dir
+      size: 791
+      nfiles: 12
+  features:
+    cmd: python pipelines/engineer-features.py 6 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 
-      "inputs/labeled_data/25-08-enwiki-25-08 data annotation - 8-1 through 
-      8-31.csv" "2025-08-01 00:00:00" "1h" 
+      "outputs/labeled_transformed/labels_only_aug25.csv" 
+      "outputs/counts_2025-08.enwiki.2025-08.csv" 
       "outputs/labeled_transformed/labels_aug25.csv"
     deps:
     - path: inputs/label_data/2025-08.enwiki.2025-08.tsv
       hash: md5
       md5: d29c79b5648885ca11f29af6f6198def
       size: 3304552022
-    - path: inputs/labeled_data/25-08-enwiki-25-08 data annotation - 8-1 through
-        8-31.csv
+    - path: outputs/counts_2025-08.enwiki.2025-08.csv
       hash: md5
-      md5: 87f54ae38e3c16beac7900c4ccac6883
-      size: 140642
-    - path: pipelines/labeled_data_transform.py
+      md5: a66982a806ee0c73673f8deeb360ce79
+      size: 416860588
+    - path: outputs/labeled_transformed/labels_only_aug25.csv
       hash: md5
-      md5: f9df0b9fed74c463834c14db88ab46eb
-      size: 8429
+      md5: d2d9862ae9c63aa38d42753ce46e38ce
+      size: 201160
+    - path: pipelines/engineer-features.py
+      hash: md5
+      md5: cddd009b89058cd0b39fc955cc8d5476
+      size: 1607
+    - path: wikilacra/features.py
+      hash: md5
+      md5: 4090edbbd18e2805956f495d1c23e5c5
+      size: 6240
     outs:
     - path: outputs/labeled_transformed/labels_aug25.csv
       hash: md5
-      md5: de794a9b56026e6e67295ab0cf46e556
-      size: 226533
-  train-RF:
-    cmd: python pipelines/RF.py "outputs/labeled_transformed/labels_aug25.csv" 
-      f1 42 1 2 0 "(1,2,3,4,5)" 0 "(50,100)" 0.2 5
-    deps:
-    - path: outputs/labeled_transformed/labels_aug25.csv
-      hash: md5
-      md5: de794a9b56026e6e67295ab0cf46e556
-      size: 226533
-    - path: pipelines/RF.py
-      hash: md5
-      md5: c86ee0e81cf30bd8412ee66d77394dfc
-      size: 2924
-    outs:
-    - path: dvclive/
-      hash: md5
-      md5: 47508f8c48001b78d0a96fa2dd4f2277.dir
-      size: 17037
-      nfiles: 5
+      md5: 5e99920d46df606f9e543e2b7f16e7fb
+      size: 334120
