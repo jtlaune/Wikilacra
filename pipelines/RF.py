@@ -2,6 +2,10 @@ import sys
 from ast import literal_eval
 from dvclive import Live
 import pandas as pd
+import plotly.express as px
+from io import BytesIO
+from matplotlib.pyplot import subplots
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit, train_test_split
@@ -72,9 +76,24 @@ if __name__ == "__main__":
 
     clf.fit(X, y)
 
+    fCMD = ConfusionMatrixDisplay.from_estimator(
+        clf,
+        X_test,
+        y_test,
+        display_labels=["NONE", "EVENT"],
+    ).figure_
+
+    fFE, axFE = subplots(
+        figsize=(6, len(clf.best_estimator_.feature_importances_) * 0.2)
+    )
+    axFE.barh(X.columns, clf.best_estimator_.feature_importances_)
+    fFE.tight_layout()
+
     cv_results = pd.DataFrame(clf.cv_results_)
 
     with Live() as live:
+        live.log_image("FeatureImportances.png", fFE)
+        live.log_image("ConfusionMatrixDisplay.png", fCMD)
         live.log_params(clf.best_params_)
         best = cv_results.loc[cv_results[f"rank_test_{metric_name}"] == 1].squeeze()
 
