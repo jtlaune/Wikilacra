@@ -60,8 +60,8 @@ stages:
       size: 334120
     - path: pipelines/RF.py
       hash: md5
-      md5: 3220db23c6f890975952360113490c3e
-      size: 2831
+      md5: cd93afdde3778c4ba737b6469359d998
+      size: 3396
     - path: wikilacra/data.py
       hash: md5
       md5: 7eaa0fff788d1efc17a1a7c9d68ff1e8
@@ -73,9 +73,9 @@ stages:
     outs:
     - path: dvclive/
       hash: md5
-      md5: eea64758c69482a9d603796faec17176.dir
-      size: 793
-      nfiles: 12
+      md5: 279656fd1b1643f166c603d98694d5cc.dir
+      size: 51896
+      nfiles: 14
   features:
     cmd: python pipelines/engineer-features.py 6 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 
