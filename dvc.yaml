@@ -17,32 +17,21 @@ stages:
     outs:
     - outputs/label_data/${label_data_extract.basename}.csv
     - outputs/${label_data_extract.counts_outname}.csv
-  labeled_data_transform:
-    cmd: python pipelines/labeled_data_transform.py 
-      "${labeled_data_transform.start_dt}" 
-      ${labeled_data_transform.rolling_avg_hrs} 
-      "inputs/labeled_data/${labeled_data_transform.labeled_basename}.csv" 
-      "outputs/labeled_transformed/${labeled_data_transform.outname}.csv"
-    deps:
-    - pipelines/labeled_data_transform.py
-    - inputs/labeled_data/${labeled_data_transform.labeled_basename}.csv
-    outs:
-    - outputs/labeled_transformed/${labeled_data_transform.outname}.csv
   features:
     cmd: python pipelines/engineer-features.py 
-      ${labeled_data_transform.rolling_avg_hrs} 
-      "inputs/label_data/${label_data_extract.basename}.tsv" 
-      "outputs/labeled_transformed/${labeled_data_transform.outname}.csv" 
-      "outputs/${label_data_extract.counts_outname}.csv" 
-      "outputs/labeled_transformed/${features.outname}.csv"
+      ${features.rolling_avg_hrs} 
+      ${features.intra_pd} ${features.intra_win}
+      "inputs/label_data/${features.dump_basename}.tsv" 
+      "inputs/labeled_data/${features.labeled_basename}.csv" 
+      "outputs/labeled_engineered/${features.outname}.csv"
+      "${features.start_dt}" "${features.end_dt}"
     deps:
-    - inputs/label_data/${label_data_extract.basename}.tsv
+    - inputs/label_data/${features.dump_basename}.tsv
     - pipelines/engineer-features.py
-    - outputs/labeled_transformed/${labeled_data_transform.outname}.csv
-    - outputs/${label_data_extract.counts_outname}.csv
-    - wikilacra/features.py
+    - wikilacra/
+    - inputs/labeled_data/${features.labeled_basename}.csv
     outs:
-    - outputs/labeled_transformed/${features.outname}.csv
+    - outputs/labeled_engineered/${features.outname}.csv
   train-RF:
     cmd: python pipelines/RF.py 
       "outputs/labeled_transformed/${features.outname}.csv" 
