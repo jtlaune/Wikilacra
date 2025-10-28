@@ -24,11 +24,11 @@ stages:
       "inputs/label_data/${features.dump_basename}.tsv" 
       "inputs/labeled_data/${features.labeled_basename}.csv" 
       "outputs/labeled_engineered/${features.outname}.csv"
-      ${features.start_dt} ${features.end_dt}
+      "${features.start_dt}" "${features.end_dt}"
     deps:
     - inputs/label_data/${features.dump_basename}.tsv
     - pipelines/engineer-features.py
-    - wikilacra/features.py
+    - wikilacra/
     - inputs/labeled_data/${features.labeled_basename}.csv
     outs:
     - outputs/labeled_engineered/${features.outname}.csv
