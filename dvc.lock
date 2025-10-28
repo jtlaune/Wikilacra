@@ -79,9 +79,8 @@ stages:
   features:
     cmd: python pipelines/engineer-features.py 6 1Min 10 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 
-      "inputs/labeled_data/aug_labeled_v3.csv" 
-      "outputs/labeled_engineered/engineered_aug25.csv" "2025-08-01 00:00:00" 
-      "2025-08-31 23:59:59"
+      "inputs/labeled_data/aug_labeled_v3.csv" "outputs/labeled_engineered/" 
+      "engineered_aug25" "2025-08-01 00:00:00" "2025-08-31 23:59:59"
     deps:
     - path: inputs/label_data/2025-08.enwiki.2025-08.tsv
       hash: md5
@@ -110,5 +109,13 @@ stages:
     outs:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
-      md5: b4b32f4e9cfce92c5794a7067152f2a6
-      size: 451220
+      md5: c28dbfe847ec4d6380a0927d2874df6a
+      size: 448526
+    - path: outputs/labeled_engineered/engineered_aug25_endog_cols.txt
+      hash: md5
+      md5: 70bfdfd148a0b5bb84cee643cff64de2
+      size: 10
+    - path: outputs/labeled_engineered/engineered_aug25_exog_cols.txt
+      hash: md5
+      md5: 31e8529f9193141d4210eec532b90f32
+      size: 662

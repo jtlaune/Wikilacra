@@ -23,7 +23,7 @@ stages:
       ${features.intra_pd} ${features.intra_win}
       "inputs/label_data/${features.dump_basename}.tsv" 
       "inputs/labeled_data/${features.labeled_basename}.csv" 
-      "outputs/labeled_engineered/${features.outname}.csv"
+      "outputs/labeled_engineered/" "${features.basename}"
       "${features.start_dt}" "${features.end_dt}"
     deps:
     - inputs/label_data/${features.dump_basename}.tsv
@@ -33,17 +33,19 @@ stages:
     - wikilacra/stream.py
     - inputs/labeled_data/${features.labeled_basename}.csv
     outs:
-    - outputs/labeled_engineered/${features.outname}.csv
+    - outputs/labeled_engineered/${features.basename}.csv
+    - outputs/labeled_engineered/${features.basename}_exog_cols.txt
+    - outputs/labeled_engineered/${features.basename}_endog_cols.txt
   train-RF:
     cmd: python pipelines/RF.py 
-      "outputs/labeled_transformed/${features.outname}.csv" 
+      "outputs/labeled_engineered/${train-RF.input_name}.csv" 
       ${train-RF.metric_name} ${train-RF.random_state} ${train-RF.n_jobs} 
       ${train-RF.max_depths_gen} "${train-RF.max_depths}" 
       ${train-RF.n_estimators_gen} "${train-RF.n_estimators}" 
       ${train-RF.test_prop} ${train-RF.K_fold_cv}
     deps:
     - pipelines/RF.py
-    - outputs/labeled_transformed/${features.outname}.csv
+    - outputs/labeled_engineered/${train-RF.input_name}.csv
     - wikilacra/scoring.py
     - wikilacra/data.py
     outs:
