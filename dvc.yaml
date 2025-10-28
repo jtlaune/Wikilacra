@@ -34,14 +34,14 @@ stages:
     - outputs/labeled_engineered/${features.outname}.csv
   train-RF:
     cmd: python pipelines/RF.py 
-      "outputs/labeled_transformed/${features.outname}.csv" 
+      "outputs/labeled_engineered/${train-RF.input_name}.csv" 
       ${train-RF.metric_name} ${train-RF.random_state} ${train-RF.n_jobs} 
       ${train-RF.max_depths_gen} "${train-RF.max_depths}" 
       ${train-RF.n_estimators_gen} "${train-RF.n_estimators}" 
       ${train-RF.test_prop} ${train-RF.K_fold_cv}
     deps:
     - pipelines/RF.py
-    - outputs/labeled_transformed/${features.outname}.csv
+    - outputs/labeled_engineered/${train-RF.input_name}.csv
     - wikilacra/scoring.py
     - wikilacra/data.py
     outs:
