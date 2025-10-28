@@ -77,34 +77,30 @@ stages:
       size: 51896
       nfiles: 14
   features:
-    cmd: python pipelines/engineer-features.py 6 
+    cmd: python pipelines/engineer-features.py 6 1Min 10 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 
-      "outputs/labeled_transformed/labels_only_aug25.csv" 
-      "outputs/counts_2025-08.enwiki.2025-08.csv" 
-      "outputs/labeled_transformed/labels_aug25.csv"
+      "inputs/labeled_data/aug_labeled_v3.csv" 
+      "outputs/labeled_engineered/engineered_aug25.csv" 2025-08-01 00:00:00 
+      2025-08-31 23:59:59
     deps:
     - path: inputs/label_data/2025-08.enwiki.2025-08.tsv
       hash: md5
       md5: d29c79b5648885ca11f29af6f6198def
       size: 3304552022
-    - path: outputs/counts_2025-08.enwiki.2025-08.csv
+    - path: inputs/labeled_data/aug_labeled_v3.csv
       hash: md5
-      md5: a66982a806ee0c73673f8deeb360ce79
-      size: 416860588
-    - path: outputs/labeled_transformed/labels_only_aug25.csv
-      hash: md5
-      md5: d2d9862ae9c63aa38d42753ce46e38ce
-      size: 201160
+      md5: f291025d9aa4c27b226641cb57e08ced
+      size: 202664
     - path: pipelines/engineer-features.py
       hash: md5
-      md5: cddd009b89058cd0b39fc955cc8d5476
-      size: 1607
+      md5: 8223a7dff332e1ea783d7c4104d78417
+      size: 9120
     - path: wikilacra/features.py
       hash: md5
-      md5: 4090edbbd18e2805956f495d1c23e5c5
-      size: 6240
+      md5: 98063e865d7c751df6c25343cea6dbf6
+      size: 7642
     outs:
-    - path: outputs/labeled_transformed/labels_aug25.csv
+    - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
-      md5: 5e99920d46df606f9e543e2b7f16e7fb
-      size: 334120
+      md5: b4b32f4e9cfce92c5794a7067152f2a6
+      size: 451220
