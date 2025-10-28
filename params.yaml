@@ -3,13 +3,15 @@ label_data_extract:
   basename: 2025-08.enwiki.2025-08
   counts_outname: counts_2025-08.enwiki.2025-08
   pre_labels: aug_labeled_v2
-labeled_data_transform:
-  rolling_avg_hrs: 6
+features:
+  dump_basename: 2025-08.enwiki.2025-08
   labeled_basename: aug_labeled_v3
   start_dt: '2025-08-01 00:00:00'
-  outname: labels_only_aug25
-features:
-  outname: labels_aug25
+  end_dt: '2025-08-31 23:59:59'
+  rolling_avg_hrs: 6
+  outname: engineered_aug25
+  intra_pd: "1Min"
+  intra_win: 10 
 train-RF:
   metric_name: f1
   random_state: 4583
