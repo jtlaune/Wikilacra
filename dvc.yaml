@@ -28,7 +28,9 @@ stages:
     deps:
     - inputs/label_data/${features.dump_basename}.tsv
     - pipelines/engineer-features.py
-    - wikilacra/
+    - wikilacra/__init__.py
+    - wikilacra/features.py
+    - wikilacra/stream.py
     - inputs/labeled_data/${features.labeled_basename}.csv
     outs:
     - outputs/labeled_engineered/${features.outname}.csv
