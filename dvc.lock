@@ -93,13 +93,20 @@ stages:
       size: 202664
     - path: pipelines/engineer-features.py
       hash: md5
-      md5: c8a4623cbcfdb1c6766d534af37cae8d
-      size: 9252
-    - path: wikilacra/
+      md5: f31f1110a1cbe8d19fde18012aba9f89
+      size: 9325
+    - path: wikilacra/__init__.py
       hash: md5
-      md5: 0d52d69433391cfa1b878435d6da08e6.dir
-      size: 34664
-      nfiles: 9
+      md5: 2cfe281f7badd3ca0379b6c582aeaab1
+      size: 2399
+    - path: wikilacra/features.py
+      hash: md5
+      md5: 98063e865d7c751df6c25343cea6dbf6
+      size: 7642
+    - path: wikilacra/stream.py
+      hash: md5
+      md5: 0aae49cdb693d319f1fd68ea8b19c60a
+      size: 3476
     outs:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
