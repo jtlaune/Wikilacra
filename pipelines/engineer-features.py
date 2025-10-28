@@ -92,9 +92,9 @@ if __name__ == "__main__":
     ###################
     CLASSES = ["EVENT", "EDIT_WAR", "VANDALISM", "NONE", "MOVED_OR_DELETED"]
 
-    engineered = labels[
-        (labels["event_timestamp"] >= start_dt) & (labels["event_timestamp"] <= end_dt)
-    ].copy()
+    engineered = labels.copy()#[
+    #    (labels["event_timestamp"] >= start_dt) & (labels["event_timestamp"] <= end_dt)
+    #].copy()
     # Drop typo-labeled data
     to_drop = engineered[
         ~engineered["EVENT, EDIT_WAR, VANDALISM, NONE, MOVED_OR_DELETED"].isin(CLASSES)
