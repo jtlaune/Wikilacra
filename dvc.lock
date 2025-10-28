@@ -80,8 +80,8 @@ stages:
     cmd: python pipelines/engineer-features.py 6 1Min 10 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 
       "inputs/labeled_data/aug_labeled_v3.csv" 
-      "outputs/labeled_engineered/engineered_aug25.csv" 2025-08-01 00:00:00 
-      2025-08-31 23:59:59
+      "outputs/labeled_engineered/engineered_aug25.csv" "2025-08-01 00:00:00" 
+      "2025-08-31 23:59:59"
     deps:
     - path: inputs/label_data/2025-08.enwiki.2025-08.tsv
       hash: md5
@@ -93,12 +93,13 @@ stages:
       size: 202664
     - path: pipelines/engineer-features.py
       hash: md5
-      md5: 8223a7dff332e1ea783d7c4104d78417
-      size: 9120
-    - path: wikilacra/features.py
+      md5: c8a4623cbcfdb1c6766d534af37cae8d
+      size: 9252
+    - path: wikilacra/
       hash: md5
-      md5: 98063e865d7c751df6c25343cea6dbf6
-      size: 7642
+      md5: 0d52d69433391cfa1b878435d6da08e6.dir
+      size: 34664
+      nfiles: 9
     outs:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
