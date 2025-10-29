@@ -34,8 +34,8 @@ if __name__ == "__main__":
     # output path for the engineered features for the labeled data
     output_dir = sys.argv[6]
     output_basename = sys.argv[7]
-    start_dt = sys.argv[8]
-    end_dt = sys.argv[9]
+    start_dt = pd.to_datetime(sys.argv[8])
+    end_dt = pd.to_datetime(sys.argv[9])
 
     ################
     # Loading Data #
@@ -51,8 +51,8 @@ if __name__ == "__main__":
         ["event_timestamp", "page_title"],
         MEDIAWIKI_HISTOR_DUMP_COL_NAMES,
         chunksize=100_000,
-        start_dt=pd.to_datetime(start_dt),
-        end_dt=pd.to_datetime(end_dt),
+        start_dt=start_dt,
+        end_dt=end_dt,
     )
     # Read all the columns in for those in the labeled set
     revisions_sel = read_data_chunked(
@@ -61,8 +61,8 @@ if __name__ == "__main__":
         MEDIAWIKI_HISTOR_DUMP_COL_NAMES,
         page_titles=sel_titles,
         chunksize=100_000,
-        start_dt=pd.to_datetime(start_dt),
-        end_dt=pd.to_datetime(end_dt),
+        start_dt=start_dt,
+        end_dt=end_dt,
     )
 
     ##################
@@ -92,9 +92,15 @@ if __name__ == "__main__":
     ###################
     CLASSES = ["EVENT", "EDIT_WAR", "VANDALISM", "NONE", "MOVED_OR_DELETED"]
 
-    engineered = labels[
-        (labels["event_timestamp"] >= start_dt) & (labels["event_timestamp"] <= end_dt)
-    ].copy()
+    engineered = labels.copy()
+    # Select the date range, ensuring event_timestamp is a datetime (otherwise
+    # it will default to lexicographical)
+    engineered["event_timestamp"] = pd.to_datetime(engineered["event_timestamp"])
+    engineered = engineered[
+        (engineered["event_timestamp"] >= start_dt)
+        & (engineered["event_timestamp"] <= end_dt)
+    ]
+
     # Drop typo-labeled data
     to_drop = engineered[
         ~engineered["EVENT, EDIT_WAR, VANDALISM, NONE, MOVED_OR_DELETED"].isin(CLASSES)
