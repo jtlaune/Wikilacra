@@ -18,27 +18,27 @@ stages:
     - outputs/label_data/${label_data_extract.basename}.csv
     - outputs/${label_data_extract.counts_outname}.csv
   features:
-    cmd: python pipelines/engineer-features.py 
-      ${features.rolling_avg_hrs} 
-      ${features.intra_pd} ${features.intra_win}
+    cmd: python pipelines/engineer-features.py ${features.rolling_avg_hrs} 
+      ${features.intra_pd} ${features.intra_win} 
       "inputs/label_data/${features.dump_basename}.tsv" 
       "inputs/labeled_data/${features.labeled_basename}.csv" 
-      "outputs/labeled_engineered/" "${features.basename}"
+      "outputs/labeled_engineered/" "${features.basename}" 
       "${features.start_dt}" "${features.end_dt}"
     deps:
     - inputs/label_data/${features.dump_basename}.tsv
     - pipelines/engineer-features.py
-    - wikilacra/
+    - wikilacra/__init__.py
+    - wikilacra/features.py
+    - wikilacra/stream.py
     - inputs/labeled_data/${features.labeled_basename}.csv
     outs:
     - outputs/labeled_engineered/${features.basename}.csv
     - outputs/labeled_engineered/${features.basename}_exog_cols.txt
     - outputs/labeled_engineered/${features.basename}_endog_cols.txt
   train-RF:
-    cmd: python pipelines/RF.py 
-      "outputs/labeled_engineered/${train-RF.input_name}.csv" 
-      ${train-RF.metric_name} ${train-RF.random_state} ${train-RF.n_jobs} 
-      ${train-RF.max_depths_gen} "${train-RF.max_depths}" 
+    cmd: python pipelines/RF.py "outputs/labeled_engineered/" 
+      "${train-RF.input_name}" ${train-RF.metric_name} ${train-RF.random_state} 
+      ${train-RF.n_jobs} ${train-RF.max_depths_gen} "${train-RF.max_depths}" 
       ${train-RF.n_estimators_gen} "${train-RF.n_estimators}" 
       ${train-RF.test_prop} ${train-RF.K_fold_cv}
     deps:
@@ -48,9 +48,9 @@ stages:
     - wikilacra/data.py
     outs:
     - dvclive/
-metrics:
-- dvclive/metrics.json
 plots:
 - dvclive/plots/metrics:
     x: step
 - dvclive/plots/images
+metrics:
+- dvclive/metrics.json

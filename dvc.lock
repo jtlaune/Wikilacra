@@ -21,8 +21,8 @@ stages:
       size: 3236
     - path: wikilacra/stream.py
       hash: md5
-      md5: 5df369c35e4326336e7758072bb6f4a6
-      size: 3103
+      md5: 9d9de9cf07d0cf268151fe9348b0a590
+      size: 3826
     outs:
     - path: outputs/counts_2025-08.enwiki.2025-08.csv
       hash: md5
@@ -51,30 +51,30 @@ stages:
       md5: d2d9862ae9c63aa38d42753ce46e38ce
       size: 201160
   train-RF:
-    cmd: python pipelines/RF.py "outputs/labeled_transformed/labels_aug25.csv" 
+    cmd: python pipelines/RF.py "outputs/labeled_engineered/" "engineered_aug25"
       f1 4583 2 1 "(1,10,10,'lin')" 0 "(200,500)" 0.2 5
     deps:
-    - path: outputs/labeled_transformed/labels_aug25.csv
+    - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
-      md5: 5e99920d46df606f9e543e2b7f16e7fb
-      size: 334120
+      md5: c28dbfe847ec4d6380a0927d2874df6a
+      size: 448526
     - path: pipelines/RF.py
       hash: md5
-      md5: cd93afdde3778c4ba737b6469359d998
-      size: 3396
+      md5: bb60127250abb1a58bcbe32c633e0cca
+      size: 4776
     - path: wikilacra/data.py
       hash: md5
-      md5: 7eaa0fff788d1efc17a1a7c9d68ff1e8
-      size: 2563
+      md5: 40ea0df249258e933f86a9d699026a60
+      size: 1879
     - path: wikilacra/scoring.py
       hash: md5
-      md5: 18667fb7a367fa98851f1362d9434f7b
-      size: 945
+      md5: f3335da86fe68fd5ce89c7fa247d4ddd
+      size: 941
     outs:
     - path: dvclive/
       hash: md5
-      md5: 279656fd1b1643f166c603d98694d5cc.dir
-      size: 51896
+      md5: 4030a697beacba7f46f9d05b4e1a5c9c.dir
+      size: 86799
       nfiles: 14
   features:
     cmd: python pipelines/engineer-features.py 6 1Min 10 
@@ -92,23 +92,30 @@ stages:
       size: 202664
     - path: pipelines/engineer-features.py
       hash: md5
-      md5: 3fc4c0624882c62ffcf3331e94a894bd
-      size: 9947
-    - path: wikilacra/
+      md5: 692204179020127dc1a9b7688cd13875
+      size: 10163
+    - path: wikilacra/__init__.py
       hash: md5
-      md5: 3ed0c27a97d5574adb27e79319df4d2a.dir
-      size: 34330
-      nfiles: 9
+      md5: 2cfe281f7badd3ca0379b6c582aeaab1
+      size: 2399
+    - path: wikilacra/features.py
+      hash: md5
+      md5: 98063e865d7c751df6c25343cea6dbf6
+      size: 7642
+    - path: wikilacra/stream.py
+      hash: md5
+      md5: 9d9de9cf07d0cf268151fe9348b0a590
+      size: 3826
     outs:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
-      md5: c28dbfe847ec4d6380a0927d2874df6a
-      size: 448526
+      md5: 5d7b32c55ce38a5a90dc247105be7eaa
+      size: 451528
     - path: outputs/labeled_engineered/engineered_aug25_endog_cols.txt
       hash: md5
       md5: 70bfdfd148a0b5bb84cee643cff64de2
       size: 10
     - path: outputs/labeled_engineered/engineered_aug25_exog_cols.txt
       hash: md5
-      md5: 31e8529f9193141d4210eec532b90f32
+      md5: e46d2c7172258e79711ac324ab6075de
       size: 662
