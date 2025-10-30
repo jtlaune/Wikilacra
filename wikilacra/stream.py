@@ -21,7 +21,11 @@ def read_data_chunked(
     end_dt=None,
 ):
     """Stream and filter the dump to stay within memory limits. Read dump file
-    and retrieve edits. If start_dt is set, need to also set end_dt for filtering to occur.
+    and retrieve edits. If start_dt is set, need to also set end_dt for
+    filtering to occur. 
+    
+    start_dt and end_dt are Datetime objects (not strings), and breaks after
+    end_dt, i.e. we assume the file is ordered by event_timestamp!
     """
 
     read_csv_kwargs = dict(
@@ -57,6 +61,10 @@ def read_data_chunked(
            mask &= (chunk["event_timestamp"] >= start_dt) & (
                chunk["event_timestamp"] <= end_dt
            )
+           # The dump data is ordered by time, so we can stop reading if this
+           # chunk starts beyond end_dt
+           if chunk["event_timestamp"].iloc[0] > end_dt:
+               break
 
         filtered = chunk.loc[mask, columns_to_keep]
         if not filtered.empty:

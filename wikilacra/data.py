@@ -7,39 +7,8 @@ engineer_common_training: engineer common features, e.g. taking the logarithm of
                           page share
 """
 
-from numpy import log, linspace, geomspace
+from numpy import linspace, geomspace
 from sklearn.model_selection import train_test_split
-
-
-def clean_for_training(df):
-    """Drop columns unused for training (e.g., the page history url)
-
-    Args:
-        df (DataFrame): proto-training data
-
-    Returns:
-        DataFrame: X
-        DataFrame: y
-    """
-    df["target"] = (df["Category"] == "EVENT") * 1
-    df["target"] = df["target"].astype("string")
-
-    X = df.drop(
-        columns=[
-            "page_id",
-            "SECOND_CLASS",
-            "COMMENT",
-            "page_is_deleted",
-            "page_url",
-            "event_timestamp",
-            "page_share_cur",
-            "page_title",
-            "Category",
-        ]
-    )
-    y = X["target"]
-    X = X.drop(columns="target")
-    return X, y
 
 
 def train_val_test(X, y, val_prop, test_prop, shuffle):

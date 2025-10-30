@@ -1,5 +1,5 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.13
+FROM python:3.14
 
 RUN mkdir /data/
 
@@ -12,7 +12,8 @@ ENV PYTHONUNBUFFERED=1
 # Install pip requirements
 COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
-RUN python -m pip install dvc pylint docformatter
+RUN python -m pip install dvc 
+RUN python -m pip install pylint
 RUN python -m pip install dvclive[image,plots,sklearn,markdown,torch]
 
 WORKDIR /app

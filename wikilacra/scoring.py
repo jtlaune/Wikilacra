@@ -27,8 +27,8 @@ def fpr_score(y, y_pred, neg_label, pos_label):
     return 1 - tnr
 
 
-pos_label = "1"
-neg_label = "0"
+pos_label = 1
+neg_label = 0
 scoring = {
     "precision": make_scorer(precision_score, pos_label=pos_label),
     "recall": make_scorer(recall_score, pos_label=pos_label),
