@@ -1,19 +1,32 @@
 """
-Module of helper functions for the WikiMedia History dump files.
+Module of helper functions for the WikiMedia History dump files and EventStream
+data streams.
 
-read_data_chunked: read large dump file chunked
-bin_and_count: bin the revisions by frequency
-
+read_data_chunked: read large dump file chunked bin_and_count: bin the revisions
+by frequency
 """
+
 import pandas as pd
 from wikilacra import MEDIAWIKI_HISTOR_DUMP_COL_NAMES
 
 
 def read_data_chunked(
-    fn, columns_to_keep, columns_to_read, edit_type="revision", chunksize=250_000
+    fn,
+    columns_to_keep,
+    columns_to_read,
+    edit_type="revision",
+    chunksize=250_000,
+    page_titles="all",
+    start_dt=None,
+    end_dt=None,
 ):
     """Stream and filter the dump to stay within memory limits. Read dump file
-    and retrieve edits."""
+    and retrieve edits. If start_dt is set, need to also set end_dt for
+    filtering to occur. 
+    
+    start_dt and end_dt are Datetime objects (not strings), and breaks after
+    end_dt, i.e. we assume the file is ordered by event_timestamp!
+    """
 
     read_csv_kwargs = dict(
         sep="	",
@@ -33,11 +46,25 @@ def read_data_chunked(
 
     for chunk in reader:
         title = chunk["page_title"]
-        mask = chunk["event_entity"].eq(edit_type) & chunk["page_namespace"].eq(0)
-        mask &= ~title.str.contains(r"/sandbox", na=False)
-        mask &= ~title.str.fullmatch(r"Sandbox", na=False)
-        mask &= ~title.str.fullmatch(r"Undefined/junk", na=False)
-        mask &= ~title.str.fullmatch(r"Wiki", na=False)
+        mask = (
+            chunk["event_entity"].eq(edit_type)
+            & chunk["page_namespace"].eq(0)
+            & ~title.str.contains(r"/sandbox", na=False)
+            & ~title.str.fullmatch(r"Sandbox", na=False)
+            & ~title.str.fullmatch(r"Undefined/junk", na=False)
+            & ~title.str.fullmatch(r"Wiki", na=False)
+        )
+        # If page_titles is set, keep only matching
+        if page_titles != "all":
+            mask &= title.isin(page_titles)
+        if start_dt and end_dt:
+           mask &= (chunk["event_timestamp"] >= start_dt) & (
+               chunk["event_timestamp"] <= end_dt
+           )
+           # The dump data is ordered by time, so we can stop reading if this
+           # chunk starts beyond end_dt
+           if chunk["event_timestamp"].iloc[0] > end_dt:
+               break
 
         filtered = chunk.loc[mask, columns_to_keep]
         if not filtered.empty:
@@ -66,8 +93,7 @@ def bin_and_count(stream, freq):
         freq (Timedelta): Timedelta with which to count.
     """
     counts = (
-        stream[stream.event_user_id.notna()]
-        .groupby([pd.Grouper(key="event_timestamp", freq=freq), "page_id"])
+        stream.groupby([pd.Grouper(key="event_timestamp", freq=freq), "page_id"])
         .agg(
             revision_count=("event_timestamp", "size"),
             page_title=("page_title", "first"),
@@ -76,11 +102,13 @@ def bin_and_count(stream, freq):
         .reset_index()
     )
     user_counts = (
-        stream[stream.event_user_id.notna()]
-        .groupby(
-            [pd.Grouper(key="event_timestamp", freq=freq), "page_id", "event_user_id"]
-        )
-        .agg(user_counts=("event_timestamp", "size"))
+        stream.groupby(
+            [
+                pd.Grouper(key="event_timestamp", freq=freq),
+                "page_id",
+                "event_user_text_historical",
+            ]
+        ).agg(user_counts=("event_timestamp", "size"))
     ).reset_index()
     user_counts = (
         user_counts.groupby(["event_timestamp", "page_id"])

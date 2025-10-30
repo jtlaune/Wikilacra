@@ -1,27 +1,56 @@
 params:
-  - params.yaml
+- params.yaml
+- dvclive/params.yaml
 stages:
   label_data_extract:
-    cmd: python pipelines/label_training_data.py
+    cmd: python pipelines/extract_data_to_label.py 
       "inputs/label_data/${label_data_extract.basename}.tsv" 
-      ${label_data_extract.freq}
-      "outputs/label_data/${label_data_extract.basename}.csv"
+      ${label_data_extract.freq} 
+      "inputs/labeled_data/${label_data_extract.pre_labels}.csv" 
+      "outputs/label_data/${label_data_extract.basename}.csv" 
+      "outputs/${label_data_extract.counts_outname}.csv"
     deps:
-      - "pipelines/label_training_data.py"
-      - "inputs/label_data/${label_data_extract.basename}.tsv" 
+    - pipelines/extract_data_to_label.py
+    - inputs/label_data/${label_data_extract.basename}.tsv
+    - inputs/labeled_data/${label_data_extract.pre_labels}.csv
+    - wikilacra/stream.py
     outs:
-      - "outputs/label_data/${label_data_extract.basename}.csv"
-  labeled_data_transform:
-    cmd: python pipelines/labeled_data_transform.py 
-      ${labeled_data_transform.rolling_avg_hrs} 
-      "inputs/label_data/${labeled_data_transform.revisions_basename}.tsv"
-      "inputs/labeled_data/${labeled_data_transform.labeled_basename}.csv" 
-      "${labeled_data_transform.start_dt}"
-      "${labeled_data_transform.freq}"
-      "outputs/labeled_transformed/${labeled_data_transform.outname}.csv"
+    - outputs/label_data/${label_data_extract.basename}.csv
+    - outputs/${label_data_extract.counts_outname}.csv
+  features:
+    cmd: python pipelines/engineer-features.py ${features.rolling_avg_hrs} 
+      ${features.intra_pd} ${features.intra_win} 
+      "inputs/label_data/${features.dump_basename}.tsv" 
+      "inputs/labeled_data/${features.labeled_basename}.csv" 
+      "outputs/labeled_engineered/" "${features.basename}" 
+      "${features.start_dt}" "${features.end_dt}"
     deps:
-      - "pipelines/labeled_data_transform.py"
-      - "inputs/label_data/${labeled_data_transform.revisions_basename}.tsv"
-      - "inputs/labeled_data/${labeled_data_transform.labeled_basename}.csv" 
+    - inputs/label_data/${features.dump_basename}.tsv
+    - pipelines/engineer-features.py
+    - wikilacra/__init__.py
+    - wikilacra/features.py
+    - wikilacra/stream.py
+    - inputs/labeled_data/${features.labeled_basename}.csv
     outs:
-    - "outputs/labeled_transformed/${labeled_data_transform.outname}.csv"
+    - outputs/labeled_engineered/${features.basename}.csv
+    - outputs/labeled_engineered/${features.basename}_exog_cols.txt
+    - outputs/labeled_engineered/${features.basename}_endog_cols.txt
+  train-RF:
+    cmd: python pipelines/RF.py "outputs/labeled_engineered/" 
+      "${train-RF.input_name}" ${train-RF.metric_name} ${train-RF.random_state} 
+      ${train-RF.n_jobs} ${train-RF.max_depths_gen} "${train-RF.max_depths}" 
+      ${train-RF.n_estimators_gen} "${train-RF.n_estimators}" 
+      ${train-RF.test_prop} ${train-RF.K_fold_cv}
+    deps:
+    - pipelines/RF.py
+    - outputs/labeled_engineered/${train-RF.input_name}.csv
+    - wikilacra/scoring.py
+    - wikilacra/data.py
+    outs:
+    - dvclive/
+plots:
+- dvclive/plots/metrics:
+    x: step
+- dvclive/plots/images
+metrics:
+- dvclive/metrics.json

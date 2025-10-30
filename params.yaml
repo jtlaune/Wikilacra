@@ -1,10 +1,26 @@
 label_data_extract:
   freq: 1h
-  basename: "2025-08.enwiki.2025-08"
-labeled_data_transform:
+  basename: 2025-08.enwiki.2025-08
+  counts_outname: counts_2025-08.enwiki.2025-08
+  pre_labels: aug_labeled_v2
+features:
+  dump_basename: 2025-08.enwiki.2025-08
+  labeled_basename: aug_labeled_v3
+  start_dt: '2025-08-01 00:00:00'
+  end_dt: '2025-08-31 23:59:59'
   rolling_avg_hrs: 6
-  revisions_basename: "2025-08.enwiki.2025-08"
-  labeled_basename: "25-08-enwiki-25-08 data annotation - 8-1 through 8-31"
-  start_dt: "2025-08-01 00:00:00"
-  freq: 1h
-  outname: "labels_aug25"
+  basename: engineered_aug25
+  intra_pd: "1Min"
+  intra_win: 10 
+train-RF:
+  input_name: engineered_aug25
+  metric_name: f1
+  random_state: 4583
+  n_jobs: 2
+  max_depths_gen: 1
+  max_depths: (1,10,10,'lin')
+  n_estimators_gen: 0
+  n_estimators: (200,500)
+  test_prop: 0.2
+  K_fold_cv: 5
+
