@@ -51,8 +51,9 @@ stages:
     - dvclive/plots/metrics/RF/
   train-XGBT:
     cmd: python pipelines/XGBT.py "outputs/labeled_engineered/" 
-      "${train-XGBT.input_name}" ${train-XGBT.metric_name} ${train-XGBT.random_state} 
-      ${train-XGBT.n_jobs} ${train-XGBT.max_depths_gen} "${train-XGBT.max_depths}" 
+      "${train-XGBT.input_name}" ${train-XGBT.metric_name} 
+      ${train-XGBT.random_state} ${train-XGBT.n_jobs} 
+      ${train-XGBT.max_depths_gen} "${train-XGBT.max_depths}" 
       ${train-XGBT.test_prop} ${train-XGBT.CV_type} ${train-XGBT.N_fold_cv}
     deps:
     - pipelines/XGBT.py

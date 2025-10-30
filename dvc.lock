@@ -124,3 +124,34 @@ stages:
       hash: md5
       md5: e46d2c7172258e79711ac324ab6075de
       size: 662
+  train-XGBT:
+    cmd: python pipelines/XGBT.py "outputs/labeled_engineered/" 
+      "engineered_aug25" f1 4583 2 1 "(1,10,10,'lin')" 0.2 KFold 5
+    deps:
+    - path: outputs/labeled_engineered/engineered_aug25.csv
+      hash: md5
+      md5: 5d7b32c55ce38a5a90dc247105be7eaa
+      size: 451528
+    - path: pipelines/XGBT.py
+      hash: md5
+      md5: f94ed01c3b38f2027f904db8f597f380
+      size: 4512
+    - path: wikilacra/data.py
+      hash: md5
+      md5: 40ea0df249258e933f86a9d699026a60
+      size: 1879
+    - path: wikilacra/scoring.py
+      hash: md5
+      md5: f3335da86fe68fd5ce89c7fa247d4ddd
+      size: 941
+    outs:
+    - path: dvclive/plots/images/XGBT/
+      hash: md5
+      md5: 9c9f8e9856911ed87c1e1073e2495717.dir
+      size: 85569
+      nfiles: 2
+    - path: dvclive/plots/metrics/XGBT/
+      hash: md5
+      md5: cef19475c7a1088577d5e7c18c6a585f.dir
+      size: 343
+      nfiles: 10
