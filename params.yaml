@@ -22,5 +22,6 @@ train-RF:
   n_estimators_gen: 0
   n_estimators: (200,500)
   test_prop: 0.2
-  K_fold_cv: 5
+  CV_type: "KFold"
+  N_fold_cv: 5
 

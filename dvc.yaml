@@ -40,7 +40,7 @@ stages:
       "${train-RF.input_name}" ${train-RF.metric_name} ${train-RF.random_state} 
       ${train-RF.n_jobs} ${train-RF.max_depths_gen} "${train-RF.max_depths}" 
       ${train-RF.n_estimators_gen} "${train-RF.n_estimators}" 
-      ${train-RF.test_prop} ${train-RF.K_fold_cv}
+      ${train-RF.test_prop} ${train-RF.CV_type} ${train-RF.N_fold_cv}
     deps:
     - pipelines/RF.py
     - outputs/labeled_engineered/${train-RF.input_name}.csv

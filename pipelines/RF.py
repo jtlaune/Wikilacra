@@ -6,7 +6,7 @@ from matplotlib.pyplot import subplots
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import ConfusionMatrixDisplay
-from sklearn.model_selection import GridSearchCV, TimeSeriesSplit, train_test_split
+from sklearn.model_selection import GridSearchCV, KFold, TimeSeriesSplit, train_test_split
 from dvclive.live import Live
 
 from wikilacra.scoring import scoring
@@ -52,8 +52,10 @@ if __name__ == "__main__":
 
     # Proportion of test data to be held out
     test_prop = float(sys.argv[10])
+    # Type of cross validation (time series or KFold)
+    CV_type = str(sys.argv[11])
     # Number of cross validation splits in the time series
-    K_fold_cv = int(sys.argv[11])
+    N_fold_cv = int(sys.argv[12])
 
     # Load the engineered and cleaned features
     engineered = pd.read_csv(
@@ -84,7 +86,12 @@ if __name__ == "__main__":
         "max_depth": max_depths,
     }
     # Do time series cross-validation split
-    cv_splitter = TimeSeriesSplit(n_splits=5)
+    if CV_type == "TimeSeries":
+        cv_splitter = TimeSeriesSplit(n_splits=N_fold_cv)
+    elif CV_type == "KFold":
+        cv_splitter = KFold(n_splits=N_fold_cv, shuffle=True)
+    else:
+        raise Warning("Supported CV_type: TimeSeries, KFold")
 
     # Grid search, optimizing for the refit metric
     clf = GridSearchCV(
