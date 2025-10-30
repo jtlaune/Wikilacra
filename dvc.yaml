@@ -1,6 +1,8 @@
 params:
 - params.yaml
 - dvclive/params.yaml
+- dvclive/XGBT/params.yaml
+- dvclive/RF/params.yaml
 stages:
   label_data_extract:
     cmd: python pipelines/extract_data_to_label.py 
@@ -40,17 +42,34 @@ stages:
       "${train-RF.input_name}" ${train-RF.metric_name} ${train-RF.random_state} 
       ${train-RF.n_jobs} ${train-RF.max_depths_gen} "${train-RF.max_depths}" 
       ${train-RF.n_estimators_gen} "${train-RF.n_estimators}" 
-      ${train-RF.test_prop} ${train-RF.K_fold_cv}
+      ${train-RF.test_prop} ${train-RF.CV_type} ${train-RF.N_fold_cv}
     deps:
     - pipelines/RF.py
     - outputs/labeled_engineered/${train-RF.input_name}.csv
     - wikilacra/scoring.py
     - wikilacra/data.py
     outs:
-    - dvclive/
+    - dvclive/RF/
+  train-XGBT:
+    cmd: python pipelines/XGBT.py "outputs/labeled_engineered/" 
+      "${train-XGBT.input_name}" ${train-XGBT.metric_name} 
+      ${train-XGBT.random_state} ${train-XGBT.n_jobs} 
+      ${train-XGBT.max_depths_gen} "${train-XGBT.max_depths}" 
+      ${train-XGBT.test_prop} ${train-XGBT.CV_type} ${train-XGBT.N_fold_cv}
+    deps:
+    - pipelines/XGBT.py
+    - outputs/labeled_engineered/${train-RF.input_name}.csv
+    - wikilacra/scoring.py
+    - wikilacra/data.py
+    outs:
+    - dvclive/XGBT/
 plots:
-- dvclive/plots/metrics:
+- dvclive/XGBT/plots/metrics:
     x: step
-- dvclive/plots/images
+- dvclive/XGBT/plots/images
+- dvclive/RF/plots/metrics:
+    x: step
+- dvclive/RF/plots/images
 metrics:
-- dvclive/metrics.json
+- dvclive/XGBT/metrics.json
+- dvclive/RF/metrics.json

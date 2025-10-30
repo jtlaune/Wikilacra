@@ -22,5 +22,16 @@ train-RF:
   n_estimators_gen: 0
   n_estimators: (200,500)
   test_prop: 0.2
-  K_fold_cv: 5
+  CV_type: "KFold"
+  N_fold_cv: 5
+train-XGBT:
+  input_name: engineered_aug25
+  metric_name: f1
+  random_state: 4583
+  n_jobs: 2
+  max_depths_gen: 1
+  max_depths: (1,10,10,'lin')
+  test_prop: 0.2
+  CV_type: "KFold"
+  N_fold_cv: 5
 

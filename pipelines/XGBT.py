@@ -4,9 +4,16 @@ from ast import literal_eval
 import pandas as pd
 from matplotlib.pyplot import subplots
 
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import ConfusionMatrixDisplay
-from sklearn.model_selection import GridSearchCV, KFold, TimeSeriesSplit, train_test_split
+from sklearn.model_selection import (
+    GridSearchCV,
+    KFold,
+    TimeSeriesSplit,
+    train_test_split,
+)
+
+import xgboost as xgb
+
 from dvclive.live import Live
 
 from wikilacra.scoring import scoring
@@ -36,26 +43,12 @@ if __name__ == "__main__":
     else:
         max_depths = literal_eval(sys.argv[7])
 
-    # generate the n_estimators grid? determines format of next argument
-    n_estimators_gen = int(sys.argv[8])
-    if n_estimators_gen:
-        # grid bounds & number of values to search. Must be a literal tuple
-        # e.g., '(1,5,5,"lin")'
-        n_estimator1, n_estimator2, n_estimator_n, n_estimator_type = literal_eval(
-            sys.argv[9]
-        )
-        n_estimators = create_parameter_grid(
-            n_estimator1, n_estimator2, n_estimator_n, n_estimator_type, int
-        )
-    else:
-        n_estimators = literal_eval(sys.argv[9])
-
     # Proportion of test data to be held out
-    test_prop = float(sys.argv[10])
+    test_prop = float(sys.argv[8])
     # Type of cross validation (time series or KFold)
-    CV_type = str(sys.argv[11])
+    CV_type = str(sys.argv[9])
     # Number of cross validation splits in the time series
-    N_fold_cv = int(sys.argv[12])
+    N_fold_cv = int(sys.argv[10])
 
     # Load the engineered and cleaned features
     engineered = pd.read_csv(
@@ -79,10 +72,9 @@ if __name__ == "__main__":
     X, X_test, y, y_test = train_test_split(X, y, test_size=test_prop, shuffle=False)
 
     # Random forest classifier with the correct random state set
-    rf = RandomForestClassifier(random_state=random_state)
+    bt = xgb.XGBClassifier(random_state=random_state, enable_categorical=True)
     # Grid search parameters
     parameters = {
-        "n_estimators": n_estimators,
         "max_depth": max_depths,
     }
     # Do time series cross-validation split
@@ -95,7 +87,7 @@ if __name__ == "__main__":
 
     # Grid search, optimizing for the refit metric
     clf = GridSearchCV(
-        rf,
+        bt,
         parameters,
         n_jobs=n_jobs,
         cv=cv_splitter,
@@ -122,7 +114,7 @@ if __name__ == "__main__":
     # Unpack the cross validation results to log
     cv_results = pd.DataFrame(clf.cv_results_)
 
-    with Live("dvclive/RF/") as live:
+    with Live("dvclive/XGBT/") as live:
         # Log images and params into dvclive
         live.log_image("FeatureImportances.png", fFE)
         live.log_image("ConfusionMatrixDisplay.png", fCMD)
