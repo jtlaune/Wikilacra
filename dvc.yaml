@@ -47,7 +47,8 @@ stages:
     - wikilacra/scoring.py
     - wikilacra/data.py
     outs:
-    - dvclive/
+    - dvclive/plots/images/RF/
+    - dvclive/plots/metrics/RF/
 plots:
 - dvclive/plots/metrics:
     x: step
