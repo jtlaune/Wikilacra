@@ -71,11 +71,16 @@ stages:
       md5: f3335da86fe68fd5ce89c7fa247d4ddd
       size: 941
     outs:
-    - path: dvclive/
+    - path: dvclive/plots/images/RF/
       hash: md5
-      md5: 9f03495045e4508776ad91cf8f8b9139.dir
-      size: 85442
-      nfiles: 14
+      md5: 4508e97b55bf42ece7f55a8bc9bde750.dir
+      size: 84193
+      nfiles: 2
+    - path: dvclive/plots/metrics/RF/
+      hash: md5
+      md5: 935b27a56ff9f1a2d45eaffb91987103.dir
+      size: 340
+      nfiles: 10
   features:
     cmd: python pipelines/engineer-features.py 6 1Min 10 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 
