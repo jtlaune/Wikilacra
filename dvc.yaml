@@ -2,6 +2,7 @@ params:
 - params.yaml
 - dvclive/params.yaml
 - dvclive/XGBT/params.yaml
+- dvclive/RF/params.yaml
 stages:
   label_data_extract:
     cmd: python pipelines/extract_data_to_label.py 
@@ -48,8 +49,7 @@ stages:
     - wikilacra/scoring.py
     - wikilacra/data.py
     outs:
-    - dvclive/plots/images/RF/
-    - dvclive/plots/metrics/RF/
+    - dvclive/RF/
   train-XGBT:
     cmd: python pipelines/XGBT.py "outputs/labeled_engineered/" 
       "${train-XGBT.input_name}" ${train-XGBT.metric_name} 
@@ -70,6 +70,10 @@ plots:
 - dvclive/XGBT/plots/metrics:
     x: step
 - dvclive/XGBT/plots/images
+- dvclive/RF/plots/metrics:
+    x: step
+- dvclive/RF/plots/images
 metrics:
 - dvclive/metrics.json
 - dvclive/XGBT/metrics.json
+- dvclive/RF/metrics.json

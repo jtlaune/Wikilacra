@@ -122,10 +122,10 @@ if __name__ == "__main__":
     # Unpack the cross validation results to log
     cv_results = pd.DataFrame(clf.cv_results_)
 
-    with Live() as live:
+    with Live("dvclive/RF/") as live:
         # Log images and params into dvclive
-        live.log_image("RF/FeatureImportances.png", fFE)
-        live.log_image("RF/ConfusionMatrixDisplay.png", fCMD)
+        live.log_image("FeatureImportances.png", fFE)
+        live.log_image("ConfusionMatrixDisplay.png", fCMD)
         live.log_params(clf.best_params_)
         # Get the results for the model that performed the best at the chose metric
         best = cv_results.loc[cv_results[f"rank_test_{metric_name}"] == 1].squeeze()
@@ -133,5 +133,5 @@ if __name__ == "__main__":
         for _metric in scoring.keys():
             mean = float(best[f"mean_test_{_metric}"])
             std = float(best[f"std_test_{_metric}"])
-            live.log_metric(f"RF/cross_val/{_metric}", mean)
-            live.log_metric(f"RF/cross_val/{_metric}-std", std)
+            live.log_metric(f"cross_val/{_metric}", mean)
+            live.log_metric(f"cross_val/{_metric}-std", std)
