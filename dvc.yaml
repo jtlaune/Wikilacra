@@ -64,9 +64,6 @@ stages:
     outs:
     - dvclive/XGBT/
 plots:
-- dvclive/plots/metrics:
-    x: step
-- dvclive/plots/images
 - dvclive/XGBT/plots/metrics:
     x: step
 - dvclive/XGBT/plots/images
@@ -74,6 +71,5 @@ plots:
     x: step
 - dvclive/RF/plots/images
 metrics:
-- dvclive/metrics.json
 - dvclive/XGBT/metrics.json
 - dvclive/RF/metrics.json
