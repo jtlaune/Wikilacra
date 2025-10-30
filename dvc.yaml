@@ -59,7 +59,8 @@ stages:
     - wikilacra/scoring.py
     - wikilacra/data.py
     outs:
-    - dvclive/
+    - dvclive/plots/images/XGBT/
+    - dvclive/plots/metrics/XGBT/
 plots:
 - dvclive/plots/metrics:
     x: step
