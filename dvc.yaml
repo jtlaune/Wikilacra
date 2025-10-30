@@ -47,7 +47,8 @@ stages:
     - wikilacra/scoring.py
     - wikilacra/data.py
     outs:
-    - dvclive/
+    - dvclive/plots/images/RF/
+    - dvclive/plots/metrics/RF/
   train-XGBT:
     cmd: python pipelines/XGBT.py "outputs/labeled_engineered/" 
       "${train-XGBT.input_name}" ${train-XGBT.metric_name} ${train-XGBT.random_state} 
