@@ -52,7 +52,7 @@ stages:
       size: 201160
   train-RF:
     cmd: python pipelines/RF.py "outputs/labeled_engineered/" "engineered_aug25"
-      f1 4583 2 1 "(1,10,10,'lin')" 0 "(200,500)" 0.2 5
+      f1 4583 2 1 "(1,10,10,'lin')" 0 "(200,500)" 0.2 KFold 5
     deps:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
@@ -60,8 +60,8 @@ stages:
       size: 451528
     - path: pipelines/RF.py
       hash: md5
-      md5: bb60127250abb1a58bcbe32c633e0cca
-      size: 4776
+      md5: 3e8e1d4a10b5f7e52079b8b5a10203a1
+      size: 5076
     - path: wikilacra/data.py
       hash: md5
       md5: 40ea0df249258e933f86a9d699026a60
@@ -73,8 +73,8 @@ stages:
     outs:
     - path: dvclive/
       hash: md5
-      md5: ef8e8ede44c5751fadeeeef18bbbfd6d.dir
-      size: 84982
+      md5: 13269bee4fbe95d51c515f6272c6679b.dir
+      size: 84990
       nfiles: 14
   features:
     cmd: python pipelines/engineer-features.py 6 1Min 10 
