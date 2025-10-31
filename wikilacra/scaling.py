@@ -1,5 +1,5 @@
-"""Scaling helper functions for classifiers.
-"""
+"""Scaling helper functions for classifiers, typically to apply before sklearn scalers."""
+
 from numpy import tanh, log1p
 
 
@@ -11,6 +11,8 @@ def scaler(df):
     This was created manually with a list of the feature columns. If you add
     more, they need to be handled here. Unscaled columns are left in for manual
     inspection.
+
+    This is typically applied *before* sklearn's scalers.
     """
     scaled = df.copy()
     scaled["avg_rev_per_page_cur"] = log1p(scaled["avg_rev_per_page_cur"])
@@ -49,4 +51,5 @@ def scaler(df):
     scaled["user_count_cur"] = log1p(scaled["user_count_cur"])
     scaled["user_ent_cur"] = scaled["user_ent_cur"]
     scaled["web_mob_revs_pct"] = scaled["web_mob_revs_pct"]
-    return scaled
+    # TODO: Do this a better way instead of just filling with 0
+    return scaled.fillna(0)
