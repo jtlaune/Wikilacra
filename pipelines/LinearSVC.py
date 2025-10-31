@@ -100,10 +100,11 @@ if __name__ == "__main__":
         "svc__loss": loss,
     }
 
-    # Do time series cross-validation split
     if CV_type == "TimeSeries":
+        # Do time series cross-validation split
         cv_splitter = TimeSeriesSplit(n_splits=N_fold_cv)
     elif CV_type == "KFold":
+        # Do KFold cross-validation split
         cv_splitter = KFold(n_splits=N_fold_cv, shuffle=True, random_state=random_state)
     else:
         raise Warning("Supported CV_type: TimeSeries, KFold")
