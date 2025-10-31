@@ -1,8 +1,14 @@
 import os
 import sys
 from ast import literal_eval
+from random import seed as random_seed
+
 import pandas as pd
+
 from matplotlib.pyplot import subplots
+
+from numpy import float32
+from numpy.random import seed as np_random_seed
 
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
@@ -12,8 +18,8 @@ from torch import nn, tensor, no_grad, sigmoid
 from torch.utils.data import TensorDataset, DataLoader
 from torch.cuda import is_available as cuda_is_available
 from torch.optim import Adam
-
-from numpy import float32
+from torch import manual_seed as torch_manual_seed
+from torch import use_deterministic_algorithms
 
 from dvclive.live import Live
 
@@ -78,14 +84,25 @@ if __name__ == "__main__":
     test_prop = float(sys.argv[6])
     # Scaler type to apply after the custom scaling (see wikilacra.scaling)
     scale_type = str(sys.argv[7])
-
+    # Learning rate
     lr = float(sys.argv[8])
+    # Dropout rate after each layer
     dropout = float(sys.argv[9])
+    # Number of hidden layers
     N_hidden = int(sys.argv[10])
+    # Size of the hidden layers
     size_hidden = int(sys.argv[11])
+    # Activation function for every layer
     activation = str(sys.argv[12])
+    # Number of training epochs
     epochs = int(sys.argv[13])
+    # Weight for positive classes
     pos_weight = float(sys.argv[14])
+
+    torch_manual_seed(random_state)
+    np_random_seed(random_state)
+    random_seed(random_state)
+    use_deterministic_algorithms(True)
 
     # Load the engineered and cleaned features
     engineered = pd.read_csv(
@@ -143,9 +160,9 @@ if __name__ == "__main__":
 with Live("dvclive/NN/") as live:
     for i in range(epochs):
         # --- train ---
+        event_model.train()
         train_loss = 0.0
         for xb, yb in train_loader:
-            event_model.train()
             xb, yb = xb.to(device), yb.to(device)
             logits = event_model(xb)
             loss = loss_function(logits, yb.squeeze(1))
