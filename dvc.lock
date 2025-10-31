@@ -186,8 +186,8 @@ stages:
       size: 451528
     - path: pipelines/NN.py
       hash: md5
-      md5: 16f8f87715a370cf03eaa6de428a1f3d
-      size: 7013
+      md5: a60e7115c1a53e2e7a5b57c21a54ecc0
+      size: 7451
     - path: wikilacra/data.py
       hash: md5
       md5: 22f318628b1e1c2ac35a2f1c85d11230
@@ -203,6 +203,6 @@ stages:
     outs:
     - path: dvclive/NN/
       hash: md5
-      md5: ea44d0b2c9bd089168c1899a593d5bd8.dir
-      size: 31490
-      nfiles: 10
+      md5: 82dc8168c2ba4098632f7cb80d844b9f.dir
+      size: 31189
+      nfiles: 16

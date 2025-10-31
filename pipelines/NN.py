@@ -140,13 +140,15 @@ if __name__ == "__main__":
 
     X_train_t = tensor(X_scaled.astype(float32))
     Y_train_t = tensor(y.astype(float32).to_numpy())
-    X_test_t = tensor(X_scaled_val.astype(float32))
-    Y_test_t = tensor(y_val.astype(float32).to_numpy())
+    X_val_t = tensor(X_scaled_val.astype(float32))
+    Y_val_t = tensor(y_val.astype(float32).to_numpy())
+    X_test_t = tensor(X_scaled_test.astype(float32))
+    Y_test_t = tensor(y_test.astype(float32).to_numpy())
 
     event_train = TensorDataset(X_train_t, Y_train_t)
-    event_test = TensorDataset(X_test_t, Y_test_t)
+    event_val = TensorDataset(X_val_t, Y_val_t)
     train_loader = DataLoader(event_train, batch_size=64)
-    test_loader = DataLoader(event_test, batch_size=64)
+    val_loader = DataLoader(event_val, batch_size=64)
 
     device = "cuda" if cuda_is_available() else "cpu"
     event_model = EventsModel(
@@ -174,32 +176,41 @@ with Live("dvclive/NN/") as live:
         train_loss /= len(train_loader.dataset)
         live.log_metric("train/loss", train_loss)
 
-        # --- eval: test error rate ---
+        # --- eval: val error rate ---
         event_model.eval()
-        test_loss = 0.0
+        val_loss = 0.0
         with no_grad():
-            for xt, yt in test_loader:
+            for xt, yt in val_loader:
                 xt, yt = xt.to(device), yt.to(device)
                 logits = event_model(xt)
-                test_loss += loss_function(logits, yt.squeeze(1)).item() * yt.size(0)
+                val_loss += loss_function(logits, yt.squeeze(1)).item() * yt.size(0)
 
-        # --- log test loss to DVCLive ---
-        test_loss /= len(test_loader.dataset)
-        live.log_metric("test/loss", test_loss)
+        # --- log val loss to DVCLive ---
+        val_loss /= len(val_loader.dataset)
+        live.log_metric("val/loss", val_loss)
         live.next_step()  # step == epoch index
 
+    # --- log val metrics ---
+    event_model.eval()
+    with no_grad():
+        logits = event_model(X_val_t)
+    val_preds = (sigmoid(logits) >= 0.5) * 1
+    for _metric in scoring_functions.keys():
+        score = scoring_functions[_metric](y_val, val_preds)
+        live.log_metric(f"val/{_metric}", score)
+
+    # --- log test metrics ---
     event_model.eval()
     with no_grad():
         logits = event_model(X_test_t)
     test_preds = (sigmoid(logits) >= 0.5) * 1
-
     for _metric in scoring_functions.keys():
-        score = scoring_functions[_metric](y_val, test_preds)
+        score = scoring_functions[_metric](y_test, test_preds)
         live.log_metric(f"test/{_metric}", score)
 
     # Confusion matrix on the test data
     fCMD = ConfusionMatrixDisplay.from_predictions(
-        y_val, test_preds, display_labels=["NONE", "EVENT"]
+        y_test, test_preds, display_labels=["NONE", "EVENT"]
     ).figure_
 
     # Log images and params into dvclive
