@@ -44,7 +44,7 @@ train-LinSVC:
   N_fold_cv: 5
   scale_type: standard
   C_gen: 1
-  C: (0.1,100,10,'geom')
+  C: (0.001,100,6,'geom')
   loss: "['squared_hinge']"
 
 

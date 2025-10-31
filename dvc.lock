@@ -147,7 +147,7 @@ stages:
       nfiles: 22
   train-LinSVC:
     cmd: python pipelines/LinearSVC.py "outputs/labeled_engineered/" 
-      "engineered_aug25" f1 4583 2 0.2 KFold 5 standard 1 "(0.1,100,10,'geom')" 
+      "engineered_aug25" f1 4583 2 0.2 KFold 5 standard 1 "(0.001,100,6,'geom')"
       "['squared_hinge']"
     deps:
     - path: outputs/labeled_engineered/engineered_aug25.csv
