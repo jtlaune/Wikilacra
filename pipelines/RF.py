@@ -135,3 +135,4 @@ if __name__ == "__main__":
             std = float(best[f"std_test_{_metric}"])
             live.log_metric(f"cross_val/{_metric}", mean)
             live.log_metric(f"cross_val/{_metric}-std", std)
+            live.log_metric(f"test/{_metric}", scoring[_metric](clf, X_test, y_test))
