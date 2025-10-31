@@ -59,7 +59,7 @@ stages:
       ${train-XGBT.test_prop} ${train-XGBT.CV_type} ${train-XGBT.N_fold_cv}
     deps:
     - pipelines/XGBT.py
-    - outputs/labeled_engineered/${train-RF.input_name}.csv
+    - outputs/labeled_engineered/${train-XGBT.input_name}.csv
     - wikilacra/scoring.py
     - wikilacra/data.py
     outs:
@@ -73,7 +73,7 @@ stages:
       "${train-LinSVC.C}" "${train-LinSVC.loss}"
     deps:
     - pipelines/LinearSVC.py
-    - outputs/labeled_engineered/${train-RF.input_name}.csv
+    - outputs/labeled_engineered/${train-LinSVC.input_name}.csv
     - wikilacra/scoring.py
     - wikilacra/data.py
     - wikilacra/scaling.py
