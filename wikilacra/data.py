@@ -52,3 +52,5 @@ def create_parameter_grid(x1, x2, n, spacing, dtype):
         _ = linspace(x1, x2, n, dtype=dtype)
         # For dvclive reasons, need to make sure its in a native Python type
         return [dtype(x) for x in _]
+    else:
+        raise Warning(f"parameter grid type is [geom,lin], not {spacing}")

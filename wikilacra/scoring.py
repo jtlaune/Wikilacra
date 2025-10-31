@@ -4,6 +4,7 @@ from sklearn.metrics import (
     precision_score,
     confusion_matrix,
     f1_score,
+    accuracy_score,
 )
 
 tpr_score = recall_score  # TPR and recall are the same metric
@@ -35,4 +36,14 @@ scoring = {
     "fpr": make_scorer(fpr_score, neg_label=neg_label, pos_label=pos_label),
     "tpr": make_scorer(tpr_score, pos_label=pos_label),
     "f1": make_scorer(f1_score, pos_label=pos_label),
+    "accuracy": make_scorer(accuracy_score),
+}
+
+scoring_functions = {
+    "precision": lambda _1, _2: precision_score(_1, _2, pos_label=pos_label),
+    "recall": lambda _1, _2: recall_score(_1, _2, pos_label=pos_label),
+    "fpr": lambda _1, _2: fpr_score(_1, _2, neg_label=neg_label, pos_label=pos_label),
+    "tpr": lambda _1, _2: tpr_score(_1, _2, pos_label=pos_label),
+    "f1": lambda _1, _2: f1_score(_1, _2, pos_label=pos_label),
+    "accuracy": lambda _1, _2: accuracy_score(_1, _2),
 }
