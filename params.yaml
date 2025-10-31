@@ -34,4 +34,17 @@ train-XGBT:
   test_prop: 0.2
   CV_type: "KFold"
   N_fold_cv: 5
+train-LinSVC:
+  input_name: engineered_aug25
+  metric_name: f1
+  random_state: 4583
+  n_jobs: 2
+  test_prop: 0.2
+  CV_type: KFold
+  N_fold_cv: 5
+  scale_type: standard
+  C_gen: 1
+  C: (0.1,100,10,'geom')
+  loss: "['squared_hinge']"
+
 

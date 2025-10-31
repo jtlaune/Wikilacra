@@ -64,8 +64,8 @@ stages:
       size: 5175
     - path: wikilacra/data.py
       hash: md5
-      md5: 40ea0df249258e933f86a9d699026a60
-      size: 1879
+      md5: 4bf22571bcb58f9a706af6fe4cbba34b
+      size: 1964
     - path: wikilacra/scoring.py
       hash: md5
       md5: 0c15e356cfdc11b1f9dc630208e8a219
@@ -73,8 +73,8 @@ stages:
     outs:
     - path: dvclive/RF/
       hash: md5
-      md5: d0282322336b51800603089943ff3313.dir
-      size: 85587
+      md5: f881194f7c88befe41031c59870051a1.dir
+      size: 85758
       nfiles: 22
   features:
     cmd: python pipelines/engineer-features.py 6 1Min 10 
@@ -133,8 +133,8 @@ stages:
       size: 4593
     - path: wikilacra/data.py
       hash: md5
-      md5: 40ea0df249258e933f86a9d699026a60
-      size: 1879
+      md5: 4bf22571bcb58f9a706af6fe4cbba34b
+      size: 1964
     - path: wikilacra/scoring.py
       hash: md5
       md5: 0c15e356cfdc11b1f9dc630208e8a219
@@ -142,6 +142,37 @@ stages:
     outs:
     - path: dvclive/XGBT/
       hash: md5
-      md5: 1dff757be8209703f756a2723f3dff05.dir
-      size: 86493
+      md5: dbe083fedf0c4aac3ff3f3e6bbe8c771.dir
+      size: 86917
       nfiles: 22
+  train-LinSVC:
+    cmd: python pipelines/LinearSVC.py "outputs/labeled_engineered/" 
+      "engineered_aug25" f1 4583 2 0.2 KFold 5 standard 1 "(0.1,100,10,'geom')" 
+      "['squared_hinge']"
+    deps:
+    - path: outputs/labeled_engineered/engineered_aug25.csv
+      hash: md5
+      md5: 5d7b32c55ce38a5a90dc247105be7eaa
+      size: 451528
+    - path: pipelines/LinearSVC.py
+      hash: md5
+      md5: dea72a97264328e1e519bd3aabff7317
+      size: 5171
+    - path: wikilacra/data.py
+      hash: md5
+      md5: 4bf22571bcb58f9a706af6fe4cbba34b
+      size: 1964
+    - path: wikilacra/scaling.py
+      hash: md5
+      md5: 0bee0af26a263554c6abfe0c658ed234
+      size: 2879
+    - path: wikilacra/scoring.py
+      hash: md5
+      md5: 0c15e356cfdc11b1f9dc630208e8a219
+      size: 1006
+    outs:
+    - path: dvclive/LinSVC/
+      hash: md5
+      md5: a967a5761fa51f7434f4ed62ce51cba8.dir
+      size: 18180
+      nfiles: 21
