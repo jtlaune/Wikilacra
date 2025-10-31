@@ -46,5 +46,17 @@ train-LinSVC:
   C_gen: 1
   C: (0.001,100,6,'geom')
   loss: "['squared_hinge']"
-
-
+train-NN:
+  input_name: engineered_aug25
+  metric_name: f1
+  random_state: 4583
+  n_jobs: 2
+  test_prop: 0.2
+  scale_type: standard
+  lr: 0.01
+  dropout: 0.0
+  N_hidden: 3
+  size_hidden: 64
+  activation: ReLU
+  epochs: 300
+  pos_weight: 3

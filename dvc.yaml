@@ -79,6 +79,21 @@ stages:
     - wikilacra/scaling.py
     outs:
     - dvclive/LinSVC/
+  train-NN:
+    cmd: python pipelines/NN.py "outputs/labeled_engineered/" 
+      "${train-NN.input_name}" ${train-NN.metric_name} ${train-NN.random_state} 
+      ${train-NN.n_jobs} ${train-NN.test_prop} ${train-NN.scale_type} 
+      ${train-NN.lr} ${train-NN.dropout} ${train-NN.N_hidden} 
+      ${train-NN.size_hidden} ${train-NN.activation} ${train-NN.epochs} 
+      ${train-NN.pos_weight}
+    deps:
+    - pipelines/NN.py
+    - outputs/labeled_engineered/${train-NN.input_name}.csv
+    - wikilacra/scoring.py
+    - wikilacra/data.py
+    - wikilacra/scaling.py
+    outs:
+    - dvclive/NN/
 plots:
 - dvclive/RF/plots/metrics:
     x: step
@@ -89,7 +104,11 @@ plots:
 - dvclive/LinSVC/plots/metrics:
     x: step
 - dvclive/LinSVC/plots/images
+- dvclive/NN/plots/metrics:
+    x: step
+- dvclive/NN/plots/images
 metrics:
 - dvclive/RF/metrics.json
 - dvclive/XGBT/metrics.json
 - dvclive/LinSVC/metrics.json
+- dvclive/NN/metrics.json
