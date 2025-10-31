@@ -3,6 +3,7 @@ params:
 - dvclive/params.yaml
 - dvclive/RF/params.yaml
 - dvclive/XGBT/params.yaml
+- dvclive/LinSVC/params.yaml
 stages:
   label_data_extract:
     cmd: python pipelines/extract_data_to_label.py 
@@ -63,6 +64,21 @@ stages:
     - wikilacra/data.py
     outs:
     - dvclive/XGBT/
+  train-LinSVC:
+    cmd: python pipelines/LinearSVC.py "outputs/labeled_engineered/" 
+      "${train-LinSVC.input_name}" ${train-LinSVC.metric_name} 
+      ${train-LinSVC.random_state} ${train-LinSVC.n_jobs} 
+      ${train-LinSVC.test_prop} ${train-LinSVC.CV_type} 
+      ${train-LinSVC.N_fold_cv} ${train-LinSVC.scale_type} ${train-LinSVC.C_gen}
+      "${train-LinSVC.C}" "${train-LinSVC.loss}"
+    deps:
+    - pipelines/LinearSVC.py
+    - outputs/labeled_engineered/${train-RF.input_name}.csv
+    - wikilacra/scoring.py
+    - wikilacra/data.py
+    - wikilacra/scaling.py
+    outs:
+    - dvclive/LinSVC/
 plots:
 - dvclive/RF/plots/metrics:
     x: step
@@ -70,6 +86,10 @@ plots:
 - dvclive/XGBT/plots/metrics:
     x: step
 - dvclive/XGBT/plots/images
+- dvclive/LinSVC/plots/metrics:
+    x: step
+- dvclive/LinSVC/plots/images
 metrics:
 - dvclive/RF/metrics.json
 - dvclive/XGBT/metrics.json
+- dvclive/LinSVC/metrics.json
