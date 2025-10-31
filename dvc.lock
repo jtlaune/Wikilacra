@@ -64,8 +64,8 @@ stages:
       size: 5175
     - path: wikilacra/data.py
       hash: md5
-      md5: 4bf22571bcb58f9a706af6fe4cbba34b
-      size: 1964
+      md5: 22f318628b1e1c2ac35a2f1c85d11230
+      size: 1984
     - path: wikilacra/scoring.py
       hash: md5
       md5: 9f7e8e3491fb727a57a8ed643f12fb07
@@ -73,8 +73,8 @@ stages:
     outs:
     - path: dvclive/RF/
       hash: md5
-      md5: 374b487ca03c48974ebef32c64cf5da9.dir
-      size: 85832
+      md5: dccb09210c6f93c6b19c822f6360fb28.dir
+      size: 85581
       nfiles: 22
   features:
     cmd: python pipelines/engineer-features.py 6 1Min 10 
@@ -133,8 +133,8 @@ stages:
       size: 4593
     - path: wikilacra/data.py
       hash: md5
-      md5: 4bf22571bcb58f9a706af6fe4cbba34b
-      size: 1964
+      md5: 22f318628b1e1c2ac35a2f1c85d11230
+      size: 1984
     - path: wikilacra/scoring.py
       hash: md5
       md5: 9f7e8e3491fb727a57a8ed643f12fb07
@@ -142,8 +142,8 @@ stages:
     outs:
     - path: dvclive/XGBT/
       hash: md5
-      md5: 96814a0742a9b7738984e28607b54007.dir
-      size: 87528
+      md5: 1359f506ebf98c064078d8cd5d4628ab.dir
+      size: 86807
       nfiles: 22
   train-LinSVC:
     cmd: python pipelines/LinearSVC.py "outputs/labeled_engineered/" 
@@ -160,8 +160,8 @@ stages:
       size: 5217
     - path: wikilacra/data.py
       hash: md5
-      md5: 4bf22571bcb58f9a706af6fe4cbba34b
-      size: 1964
+      md5: 22f318628b1e1c2ac35a2f1c85d11230
+      size: 1984
     - path: wikilacra/scaling.py
       hash: md5
       md5: 0bee0af26a263554c6abfe0c658ed234
@@ -178,7 +178,7 @@ stages:
       nfiles: 21
   train-NN:
     cmd: python pipelines/NN.py "outputs/labeled_engineered/" "engineered_aug25"
-      f1 4583 2 0.2 standard 0.01 0.0 3 64 ReLU 300 3
+      f1 4583 2 0.2 0.1 standard 0.01 0.0 3 64 ReLU 300 3
     deps:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
@@ -186,12 +186,12 @@ stages:
       size: 451528
     - path: pipelines/NN.py
       hash: md5
-      md5: 6217d3ccbbf2a2f8e85f613f73394768
-      size: 7020
+      md5: 16f8f87715a370cf03eaa6de428a1f3d
+      size: 7013
     - path: wikilacra/data.py
       hash: md5
-      md5: 4bf22571bcb58f9a706af6fe4cbba34b
-      size: 1964
+      md5: 22f318628b1e1c2ac35a2f1c85d11230
+      size: 1984
     - path: wikilacra/scaling.py
       hash: md5
       md5: 0bee0af26a263554c6abfe0c658ed234
@@ -203,6 +203,6 @@ stages:
     outs:
     - path: dvclive/NN/
       hash: md5
-      md5: 68e564e03e634cab9c28c7faf983b879.dir
-      size: 31320
+      md5: ea44d0b2c9bd089168c1899a593d5bd8.dir
+      size: 31490
       nfiles: 10

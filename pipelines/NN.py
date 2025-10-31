@@ -5,13 +5,10 @@ from random import seed as random_seed
 
 import pandas as pd
 
-from matplotlib.pyplot import subplots
-
 from numpy import float32
 from numpy.random import seed as np_random_seed
 
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.preprocessing import StandardScaler, RobustScaler
 
 from torch import nn, tensor, no_grad, sigmoid
@@ -24,7 +21,7 @@ from torch import use_deterministic_algorithms
 from dvclive.live import Live
 
 from wikilacra.scoring import scoring_functions
-from wikilacra.data import create_parameter_grid
+from wikilacra.data import train_val_test
 from wikilacra.scaling import scaler
 
 
@@ -80,24 +77,26 @@ if __name__ == "__main__":
     random_state = int(sys.argv[4])
     # Number of concurrent jobs for cross-validation grid search
     n_jobs = int(sys.argv[5])
-    # Proportion of test data to be held out
-    test_prop = float(sys.argv[6])
+    # Proportion of test data to be held out for validation
+    val_prop = float(sys.argv[6])
+    # Proportion of test data to be held out for test
+    test_prop = float(sys.argv[7])
     # Scaler type to apply after the custom scaling (see wikilacra.scaling)
-    scale_type = str(sys.argv[7])
+    scale_type = str(sys.argv[8])
     # Learning rate
-    lr = float(sys.argv[8])
+    lr = float(sys.argv[9])
     # Dropout rate after each layer
-    dropout = float(sys.argv[9])
+    dropout = float(sys.argv[10])
     # Number of hidden layers
-    N_hidden = int(sys.argv[10])
+    N_hidden = int(sys.argv[11])
     # Size of the hidden layers
-    size_hidden = int(sys.argv[11])
+    size_hidden = int(sys.argv[12])
     # Activation function for every layer
-    activation = str(sys.argv[12])
+    activation = str(sys.argv[13])
     # Number of training epochs
-    epochs = int(sys.argv[13])
+    epochs = int(sys.argv[14])
     # Weight for positive classes
-    pos_weight = float(sys.argv[14])
+    pos_weight = float(sys.argv[15])
 
     torch_manual_seed(random_state)
     np_random_seed(random_state)
@@ -135,14 +134,14 @@ if __name__ == "__main__":
 
     # Split the test set off, shuffle=False which means we're getting the last
     # entries in test
-    X_scaled, X_scaled_test, y, y_test = train_test_split(
-        X_scaled, y, test_size=test_prop, shuffle=False
+    X_scaled, X_scaled_val, X_scaled_test, y, y_val, y_test = train_val_test(
+        X_scaled, y, val_prop, test_prop, False
     )
 
     X_train_t = tensor(X_scaled.astype(float32))
     Y_train_t = tensor(y.astype(float32).to_numpy())
-    X_test_t = tensor(X_scaled_test.astype(float32))
-    Y_test_t = tensor(y_test.astype(float32).to_numpy())
+    X_test_t = tensor(X_scaled_val.astype(float32))
+    Y_test_t = tensor(y_val.astype(float32).to_numpy())
 
     event_train = TensorDataset(X_train_t, Y_train_t)
     event_test = TensorDataset(X_test_t, Y_test_t)
@@ -195,12 +194,12 @@ with Live("dvclive/NN/") as live:
     test_preds = (sigmoid(logits) >= 0.5) * 1
 
     for _metric in scoring_functions.keys():
-        score = scoring_functions[_metric](y_test, test_preds)
+        score = scoring_functions[_metric](y_val, test_preds)
         live.log_metric(f"test/{_metric}", score)
 
     # Confusion matrix on the test data
     fCMD = ConfusionMatrixDisplay.from_predictions(
-        y_test, test_preds, display_labels=["NONE", "EVENT"]
+        y_val, test_preds, display_labels=["NONE", "EVENT"]
     ).figure_
 
     # Log images and params into dvclive

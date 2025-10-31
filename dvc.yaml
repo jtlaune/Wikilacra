@@ -82,10 +82,10 @@ stages:
   train-NN:
     cmd: python pipelines/NN.py "outputs/labeled_engineered/" 
       "${train-NN.input_name}" ${train-NN.metric_name} ${train-NN.random_state} 
-      ${train-NN.n_jobs} ${train-NN.test_prop} ${train-NN.scale_type} 
-      ${train-NN.lr} ${train-NN.dropout} ${train-NN.N_hidden} 
-      ${train-NN.size_hidden} ${train-NN.activation} ${train-NN.epochs} 
-      ${train-NN.pos_weight}
+      ${train-NN.n_jobs} ${train-NN.val_prop} ${train-NN.test_prop} 
+      ${train-NN.scale_type} ${train-NN.lr} ${train-NN.dropout} 
+      ${train-NN.N_hidden} ${train-NN.size_hidden} ${train-NN.activation} 
+      ${train-NN.epochs} ${train-NN.pos_weight}
     deps:
     - pipelines/NN.py
     - outputs/labeled_engineered/${train-NN.input_name}.csv
