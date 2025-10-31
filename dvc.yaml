@@ -1,8 +1,8 @@
 params:
 - params.yaml
 - dvclive/params.yaml
-- dvclive/XGBT/params.yaml
 - dvclive/RF/params.yaml
+- dvclive/XGBT/params.yaml
 stages:
   label_data_extract:
     cmd: python pipelines/extract_data_to_label.py 
@@ -64,12 +64,12 @@ stages:
     outs:
     - dvclive/XGBT/
 plots:
-- dvclive/XGBT/plots/metrics:
-    x: step
-- dvclive/XGBT/plots/images
 - dvclive/RF/plots/metrics:
     x: step
 - dvclive/RF/plots/images
+- dvclive/XGBT/plots/metrics:
+    x: step
+- dvclive/XGBT/plots/images
 metrics:
-- dvclive/XGBT/metrics.json
 - dvclive/RF/metrics.json
+- dvclive/XGBT/metrics.json
