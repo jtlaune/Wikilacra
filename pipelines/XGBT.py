@@ -1,5 +1,6 @@
 import os
 import sys
+from pickle import dump
 from ast import literal_eval
 import pandas as pd
 from matplotlib.pyplot import subplots
@@ -121,10 +122,15 @@ if __name__ == "__main__":
         live.log_params(clf.best_params_)
         # Get the results for the model that performed the best at the chose metric
         best = cv_results.loc[cv_results[f"rank_test_{metric_name}"] == 1].squeeze()
+
+        with open("outputs/models/XGBT-model.pkl", "wb") as f:
+            dump(clf, f)
+        live.log_artifact("outputs/models/XGBT-model.pkl", name="XGBT-model")
+
         # Save the best cross-validation metrics
         for _metric in scoring.keys():
             mean = float(best[f"mean_test_{_metric}"])
             std = float(best[f"std_test_{_metric}"])
-            live.log_metric(f"cross_val/{_metric}", mean)
-            live.log_metric(f"cross_val/{_metric}-std", std)
-            live.log_metric(f"test/{_metric}", scoring[_metric](clf, X_test, y_test))
+            live.log_metric(f"cross_val/{_metric}", mean, plot=False)
+            live.log_metric(f"cross_val/{_metric}-std", std, plot=False)
+            live.log_metric(f"test/{_metric}", scoring[_metric](clf, X_test, y_test), plot=False)

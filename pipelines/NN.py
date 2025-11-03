@@ -17,6 +17,7 @@ from torch.cuda import is_available as cuda_is_available
 from torch.optim import Adam
 from torch import manual_seed as torch_manual_seed
 from torch import use_deterministic_algorithms
+from torch import save as torch_save
 
 from dvclive.live import Live
 
@@ -197,7 +198,7 @@ with Live("dvclive/NN/") as live:
     val_preds = (sigmoid(logits) >= 0.5) * 1
     for _metric in scoring_functions.keys():
         score = scoring_functions[_metric](y_val, val_preds)
-        live.log_metric(f"val/{_metric}", score)
+        live.log_metric(f"val/{_metric}", score, plot=False)
 
     # --- log test metrics ---
     event_model.eval()
@@ -206,7 +207,12 @@ with Live("dvclive/NN/") as live:
     test_preds = (sigmoid(logits) >= 0.5) * 1
     for _metric in scoring_functions.keys():
         score = scoring_functions[_metric](y_test, test_preds)
-        live.log_metric(f"test/{_metric}", score)
+        live.log_metric(f"test/{_metric}", score, plot=False)
+
+    torch_save(event_model, "outputs/models/NN-model.pt")
+    torch_save(event_model.state_dict(), "outputs/models/NN-model-state.pt")
+    live.log_artifact("outputs/models/NN-model.pt", name="NN-model")
+    live.log_artifact("outputs/models/NN-model-state.pt", name="NN-model-state")
 
     # Confusion matrix on the test data
     fCMD = ConfusionMatrixDisplay.from_predictions(

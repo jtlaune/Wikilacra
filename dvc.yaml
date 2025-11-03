@@ -1,9 +1,9 @@
 params:
 - params.yaml
 - dvclive/params.yaml
+- dvclive/LinSVC/params.yaml
 - dvclive/RF/params.yaml
 - dvclive/XGBT/params.yaml
-- dvclive/LinSVC/params.yaml
 stages:
   label_data_extract:
     cmd: python pipelines/extract_data_to_label.py 
@@ -50,7 +50,10 @@ stages:
     - wikilacra/scoring.py
     - wikilacra/data.py
     outs:
-    - dvclive/RF/
+    - dvclive/RF/metrics.json
+    - dvclive/RF/params.yaml
+    - dvclive/RF/plots/images/FeatureImportances.png
+    - dvclive/RF/plots/images/ConfusionMatrixDisplay.png
   train-XGBT:
     cmd: python pipelines/XGBT.py "outputs/labeled_engineered/" 
       "${train-XGBT.input_name}" ${train-XGBT.metric_name} 
@@ -63,7 +66,10 @@ stages:
     - wikilacra/scoring.py
     - wikilacra/data.py
     outs:
-    - dvclive/XGBT/
+    - dvclive/XGBT/metrics.json
+    - dvclive/XGBT/params.yaml
+    - dvclive/XGBT/plots/images/FeatureImportances.png
+    - dvclive/XGBT/plots/images/ConfusionMatrixDisplay.png
   train-LinSVC:
     cmd: python pipelines/LinearSVC.py "outputs/labeled_engineered/" 
       "${train-LinSVC.input_name}" ${train-LinSVC.metric_name} 
@@ -78,7 +84,9 @@ stages:
     - wikilacra/data.py
     - wikilacra/scaling.py
     outs:
-    - dvclive/LinSVC/
+    - dvclive/LinSVC/metrics.json
+    - dvclive/LinSVC/params.yaml
+    - dvclive/LinSVC/plots/images/ConfusionMatrixDisplay.png
   train-NN:
     cmd: python pipelines/NN.py "outputs/labeled_engineered/" 
       "${train-NN.input_name}" ${train-NN.metric_name} ${train-NN.random_state} 
@@ -93,22 +101,30 @@ stages:
     - wikilacra/data.py
     - wikilacra/scaling.py
     outs:
-    - dvclive/NN/
+    - dvclive/NN/metrics.json
+    - dvclive/NN/plots/images/ConfusionMatrixDisplay.png
+    - dvclive/NN/plots/metrics/val
+    - dvclive/NN/plots/metrics/train
 plots:
-- dvclive/RF/plots/metrics:
-    x: step
-- dvclive/RF/plots/images
-- dvclive/XGBT/plots/metrics:
-    x: step
-- dvclive/XGBT/plots/images
-- dvclive/LinSVC/plots/metrics:
-    x: step
 - dvclive/LinSVC/plots/images
 - dvclive/NN/plots/metrics:
     x: step
 - dvclive/NN/plots/images
+- dvclive/RF/plots/images
+- dvclive/XGBT/plots/images
 metrics:
-- dvclive/RF/metrics.json
-- dvclive/XGBT/metrics.json
 - dvclive/LinSVC/metrics.json
 - dvclive/NN/metrics.json
+- dvclive/RF/metrics.json
+- dvclive/XGBT/metrics.json
+artifacts:
+  RF-model:
+    path: outputs/models/RF-model.pkl
+  XGBT-model:
+    path: outputs/models/XGBT-model.pkl
+  LinSVC-model:
+    path: outputs/models/LinSVC.pkl
+  NN-model:
+    path: outputs/models/NN-model.pt
+  NN-model-state:
+    path: outputs/models/NN-model-state.pt

@@ -1,12 +1,18 @@
 import os
 import sys
+from pickle import dump
 from ast import literal_eval
 import pandas as pd
 from matplotlib.pyplot import subplots
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import ConfusionMatrixDisplay
-from sklearn.model_selection import GridSearchCV, KFold, TimeSeriesSplit, train_test_split
+from sklearn.model_selection import (
+    GridSearchCV,
+    KFold,
+    TimeSeriesSplit,
+    train_test_split,
+)
 from dvclive.live import Live
 
 from wikilacra.scoring import scoring
@@ -129,10 +135,17 @@ if __name__ == "__main__":
         live.log_params(clf.best_params_)
         # Get the results for the model that performed the best at the chose metric
         best = cv_results.loc[cv_results[f"rank_test_{metric_name}"] == 1].squeeze()
+
+        with open("outputs/models/RF-model.pkl", "wb") as f:
+            dump(clf, f)
+        live.log_artifact("outputs/models/RF-model.pkl", name="RF-model")
+
         # Save the best cross-validation metrics
         for _metric in scoring.keys():
             mean = float(best[f"mean_test_{_metric}"])
             std = float(best[f"std_test_{_metric}"])
-            live.log_metric(f"cross_val/{_metric}", mean)
-            live.log_metric(f"cross_val/{_metric}-std", std)
-            live.log_metric(f"test/{_metric}", scoring[_metric](clf, X_test, y_test))
+            live.log_metric(f"cross_val/{_metric}", mean, plot=False)
+            live.log_metric(f"cross_val/{_metric}-std", std, plot=False)
+            live.log_metric(
+                f"test/{_metric}", scoring[_metric](clf, X_test, y_test), plot=False
+            )
