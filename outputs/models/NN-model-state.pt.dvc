@@ -1,0 +1,5 @@
+outs:
+- md5: cdc844794f5fbaaf57417a9fbbdc458f
+  size: 4713
+  hash: md5
+  path: NN-model-state.pt
