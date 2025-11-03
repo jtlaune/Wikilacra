@@ -10,8 +10,8 @@ features:
   end_dt: '2025-08-31 23:59:59'
   rolling_avg_hrs: 6
   basename: engineered_aug25
-  intra_pd: "1Min"
-  intra_win: 10 
+  intra_pd: 1Min
+  intra_win: 10
 train-RF:
   input_name: engineered_aug25
   metric_name: f1
@@ -22,7 +22,7 @@ train-RF:
   n_estimators_gen: 0
   n_estimators: (200,500)
   test_prop: 0.2
-  CV_type: "KFold"
+  CV_type: KFold
   N_fold_cv: 5
 train-XGBT:
   input_name: engineered_aug25
@@ -32,7 +32,7 @@ train-XGBT:
   max_depths_gen: 1
   max_depths: (1,10,10,'lin')
   test_prop: 0.2
-  CV_type: "KFold"
+  CV_type: KFold
   N_fold_cv: 5
 train-LinSVC:
   input_name: engineered_aug25
@@ -51,7 +51,8 @@ train-NN:
   metric_name: f1
   random_state: 4583
   n_jobs: 2
-  test_prop: 0.2
+  val_prop: 0.2
+  test_prop: 0.1
   scale_type: standard
   lr: 0.01
   dropout: 0.0

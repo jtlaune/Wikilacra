@@ -26,10 +26,10 @@ def train_val_test(X, y, val_prop, test_prop, shuffle):
         DataFrame]: X_train, X_val, X_test, y_train, y_val, y_test
     """
     X_train, _X, y_train, _y = train_test_split(
-        X, y, val_prop + test_prop, shuffle=shuffle
+        X, y, test_size=val_prop + test_prop, shuffle=shuffle
     )
     X_val, X_test, y_val, y_test = train_test_split(
-        _X, _y, test_prop / (val_prop + test_prop), shuffle=shuffle
+        _X, _y, test_size=test_prop / (val_prop + test_prop), shuffle=shuffle
     )
     return X_train, X_val, X_test, y_train, y_val, y_test
 
