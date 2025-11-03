@@ -178,8 +178,8 @@ stages:
       size: 451528
     - path: pipelines/LinearSVC.py
       hash: md5
-      md5: e6668e60129a799a0e6ba30bad770bcd
-      size: 5447
+      md5: 920b89896926bcdb535118d073911221
+      size: 5459
     - path: wikilacra/data.py
       hash: md5
       md5: 22f318628b1e1c2ac35a2f1c85d11230

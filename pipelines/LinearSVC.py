@@ -134,9 +134,9 @@ if __name__ == "__main__":
         # Get the results for the model that performed the best at the chose metric
         best = cv_results.loc[cv_results[f"rank_test_{metric_name}"] == 1].squeeze()
         
-        with open("outputs/models/LinSVC.pkl", "wb") as f:
+        with open("outputs/models/LinSVC-model.pkl", "wb") as f:
             dump(clf, f)
-        live.log_artifact("outputs/models/LinSVC.pkl", name="LinSVC-model")
+        live.log_artifact("outputs/models/LinSVC-model.pkl", name="LinSVC-model")
 
         # Save the best cross-validation metrics
         for _metric in scoring.keys():
