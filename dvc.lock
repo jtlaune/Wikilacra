@@ -60,8 +60,8 @@ stages:
       size: 451528
     - path: pipelines/RF.py
       hash: md5
-      md5: f4052afdc164491e795b4692ceb41020
-      size: 5448
+      md5: 87ced588a845aebe66351332c7bb5b07
+      size: 5872
     - path: wikilacra/data.py
       hash: md5
       md5: 22f318628b1e1c2ac35a2f1c85d11230
@@ -70,23 +70,6 @@ stages:
       hash: md5
       md5: 9f7e8e3491fb727a57a8ed643f12fb07
       size: 1453
-    outs:
-    - path: dvclive/RF/metrics.json
-      hash: md5
-      md5: 5892c4f59c6c098349eb052e05f91b83
-      size: 754
-    - path: dvclive/RF/params.yaml
-      hash: md5
-      md5: 78366c671aae9dab399054734fd7396a
-      size: 32
-    - path: dvclive/RF/plots/images/ConfusionMatrixDisplay.png
-      hash: md5
-      md5: 7f2a673b98c1a0efbe4f5b3649806610
-      size: 15429
-    - path: dvclive/RF/plots/images/FeatureImportances.png
-      hash: md5
-      md5: a36458ddaed20bb59d8576861a46363b
-      size: 68950
   features:
     cmd: python pipelines/engineer-features.py 6 1Min 10 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 

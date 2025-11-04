@@ -4,6 +4,7 @@ from pickle import dump
 from ast import literal_eval
 import pandas as pd
 from matplotlib.pyplot import subplots
+from io import BytesIO
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import ConfusionMatrixDisplay
@@ -13,139 +14,149 @@ from sklearn.model_selection import (
     TimeSeriesSplit,
     train_test_split,
 )
-from dvclive.live import Live
+
+from mlflow import (
+    set_tracking_uri,
+    start_run,
+    log_metric,
+    log_figure,
+    log_params,
+)
+from mlflow.sklearn import log_model
 
 from wikilacra.scoring import scoring
 from wikilacra.data import create_parameter_grid
 
 if __name__ == "__main__":
-    # Directory of the data
-    engineered_dir = sys.argv[1]
-    # Base name the engineered data
-    engineered_basename = sys.argv[2]
-    # Metric to optimize in cross-validation
-    metric_name = sys.argv[3]  # precision, recall, fpr, tpr, f1
-    # Random state to set in the appropriate sklearn functions
-    random_state = int(sys.argv[4])
-    # Number of concurrent jobs for cross-validation grid search
-    n_jobs = int(sys.argv[5])
+    set_tracking_uri("http://localhost:5000")
+    with start_run():
+        # Directory of the data
+        engineered_dir = sys.argv[1]
+        # Base name the engineered data
+        engineered_basename = sys.argv[2]
+        # Metric to optimize in cross-validation
+        metric_name = sys.argv[3]  # precision, recall, fpr, tpr, f1
+        # Random state to set in the appropriate sklearn functions
+        random_state = int(sys.argv[4])
+        # Number of concurrent jobs for cross-validation grid search
+        n_jobs = int(sys.argv[5])
 
-    # generate the max_depths grid? determines format of next argument
-    max_depths_gen = int(sys.argv[6])
-    if max_depths_gen:
-        # grid bounds & number of values to search. Must be a literal tuple
-        # e.g., '(1,5,5,"lin")'
-        max_depth1, max_depth2, max_depth_n, max_depth_type = literal_eval(sys.argv[7])
-        max_depths = create_parameter_grid(
-            max_depth1, max_depth2, max_depth_n, max_depth_type, int
+        # generate the max_depths grid? determines format of next argument
+        max_depths_gen = int(sys.argv[6])
+        if max_depths_gen:
+            # grid bounds & number of values to search. Must be a literal tuple
+            # e.g., '(1,5,5,"lin")'
+            max_depth1, max_depth2, max_depth_n, max_depth_type = literal_eval(
+                sys.argv[7]
+            )
+            max_depths = create_parameter_grid(
+                max_depth1, max_depth2, max_depth_n, max_depth_type, int
+            )
+        else:
+            max_depths = literal_eval(sys.argv[7])
+
+        # generate the n_estimators grid? determines format of next argument
+        n_estimators_gen = int(sys.argv[8])
+        if n_estimators_gen:
+            # grid bounds & number of values to search. Must be a literal tuple
+            # e.g., '(1,5,5,"lin")'
+            n_estimator1, n_estimator2, n_estimator_n, n_estimator_type = literal_eval(
+                sys.argv[9]
+            )
+            n_estimators = create_parameter_grid(
+                n_estimator1, n_estimator2, n_estimator_n, n_estimator_type, int
+            )
+        else:
+            n_estimators = literal_eval(sys.argv[9])
+
+        # Proportion of test data to be held out
+        test_prop = float(sys.argv[10])
+        # Type of cross validation (time series or KFold)
+        CV_type = str(sys.argv[11])
+        # Number of cross validation splits in the time series
+        N_fold_cv = int(sys.argv[12])
+
+        # Load the engineered and cleaned features
+        engineered = pd.read_csv(
+            os.path.join(engineered_dir, engineered_basename + ".csv"), index_col=0
         )
-    else:
-        max_depths = literal_eval(sys.argv[7])
+        # Read the endog/exog column lists
+        with open(
+            os.path.join(engineered_dir, engineered_basename + "_exog_cols.txt"), "r"
+        ) as f:
+            exog_cols = literal_eval(f.readline())
+        with open(
+            os.path.join(engineered_dir, engineered_basename + "_endog_cols.txt"), "r"
+        ) as f:
+            endog_cols = literal_eval(f.readline())
+        # X is the exog cols, y is the endog cols
+        X = engineered[exog_cols]
+        y = engineered[endog_cols].astype(int)
 
-    # generate the n_estimators grid? determines format of next argument
-    n_estimators_gen = int(sys.argv[8])
-    if n_estimators_gen:
-        # grid bounds & number of values to search. Must be a literal tuple
-        # e.g., '(1,5,5,"lin")'
-        n_estimator1, n_estimator2, n_estimator_n, n_estimator_type = literal_eval(
-            sys.argv[9]
+        # Split the test set off, shuffle=False which means we're getting the last
+        # entries in test
+        X, X_test, y, y_test = train_test_split(
+            X, y, test_size=test_prop, shuffle=False
         )
-        n_estimators = create_parameter_grid(
-            n_estimator1, n_estimator2, n_estimator_n, n_estimator_type, int
+
+        # Random forest classifier with the correct random state set
+        rf = RandomForestClassifier(random_state=random_state)
+        # Grid search parameters
+        parameters = {
+            "n_estimators": n_estimators,
+            "max_depth": max_depths,
+        }
+        # Do time series cross-validation split
+        if CV_type == "TimeSeries":
+            cv_splitter = TimeSeriesSplit(n_splits=N_fold_cv)
+        elif CV_type == "KFold":
+            cv_splitter = KFold(n_splits=N_fold_cv, shuffle=True, random_state=random_state)
+        else:
+            raise Warning("Supported CV_type: TimeSeries, KFold")
+
+        # Grid search, optimizing for the refit metric
+        clf = GridSearchCV(
+            rf,
+            parameters,
+            n_jobs=n_jobs,
+            cv=cv_splitter,
+            scoring=scoring,
+            refit=metric_name,
         )
-    else:
-        n_estimators = literal_eval(sys.argv[9])
+        clf.fit(X, y.values.ravel())
 
-    # Proportion of test data to be held out
-    test_prop = float(sys.argv[10])
-    # Type of cross validation (time series or KFold)
-    CV_type = str(sys.argv[11])
-    # Number of cross validation splits in the time series
-    N_fold_cv = int(sys.argv[12])
+        # Confusion matrix on the test data
+        fCMD = ConfusionMatrixDisplay.from_estimator(
+            clf,
+            X_test,
+            y_test,
+            display_labels=["NONE", "EVENT"],
+        ).figure_
 
-    # Load the engineered and cleaned features
-    engineered = pd.read_csv(
-        os.path.join(engineered_dir, engineered_basename + ".csv"), index_col=0
-    )
-    # Read the endog/exog column lists
-    with open(
-        os.path.join(engineered_dir, engineered_basename + "_exog_cols.txt"), "r"
-    ) as f:
-        exog_cols = literal_eval(f.readline())
-    with open(
-        os.path.join(engineered_dir, engineered_basename + "_endog_cols.txt"), "r"
-    ) as f:
-        endog_cols = literal_eval(f.readline())
-    # X is the exog cols, y is the endog cols
-    X = engineered[exog_cols]
-    y = engineered[endog_cols].astype(int)
+        # Feature importances from the RF algorithm
+        fFE, axFE = subplots(
+            figsize=(6, len(clf.best_estimator_.feature_importances_) * 0.2)
+        )
+        axFE.barh(X.columns, clf.best_estimator_.feature_importances_)
+        fFE.tight_layout()
 
-    # Split the test set off, shuffle=False which means we're getting the last
-    # entries in test
-    X, X_test, y, y_test = train_test_split(X, y, test_size=test_prop, shuffle=False)
+        # Unpack the cross validation results to log
+        cv_results = pd.DataFrame(clf.cv_results_)
 
-    # Random forest classifier with the correct random state set
-    rf = RandomForestClassifier(random_state=random_state)
-    # Grid search parameters
-    parameters = {
-        "n_estimators": n_estimators,
-        "max_depth": max_depths,
-    }
-    # Do time series cross-validation split
-    if CV_type == "TimeSeries":
-        cv_splitter = TimeSeriesSplit(n_splits=N_fold_cv)
-    elif CV_type == "KFold":
-        cv_splitter = KFold(n_splits=N_fold_cv, shuffle=True)
-    else:
-        raise Warning("Supported CV_type: TimeSeries, KFold")
-
-    # Grid search, optimizing for the refit metric
-    clf = GridSearchCV(
-        rf,
-        parameters,
-        n_jobs=n_jobs,
-        cv=cv_splitter,
-        scoring=scoring,
-        refit=metric_name,
-    )
-    clf.fit(X, y.values.ravel())
-
-    # Confusion matrix on the test data
-    fCMD = ConfusionMatrixDisplay.from_estimator(
-        clf,
-        X_test,
-        y_test,
-        display_labels=["NONE", "EVENT"],
-    ).figure_
-
-    # Feature importances from the RF algorithm
-    fFE, axFE = subplots(
-        figsize=(6, len(clf.best_estimator_.feature_importances_) * 0.2)
-    )
-    axFE.barh(X.columns, clf.best_estimator_.feature_importances_)
-    fFE.tight_layout()
-
-    # Unpack the cross validation results to log
-    cv_results = pd.DataFrame(clf.cv_results_)
-
-    with Live("dvclive/RF/") as live:
         # Log images and params into dvclive
-        live.log_image("FeatureImportances.png", fFE)
-        live.log_image("ConfusionMatrixDisplay.png", fCMD)
-        live.log_params(clf.best_params_)
+        log_figure(fFE, "FeatureImportances.png")
+        log_figure(fCMD, "ConfusionMatrixDisplay.png")
+
+        log_params(clf.best_params_)
         # Get the results for the model that performed the best at the chose metric
         best = cv_results.loc[cv_results[f"rank_test_{metric_name}"] == 1].squeeze()
 
-        with open("outputs/models/RF-model.pkl", "wb") as f:
-            dump(clf, f)
-        live.log_artifact("outputs/models/RF-model.pkl", name="RF-model")
+        log_model(clf, name="model")
 
         # Save the best cross-validation metrics
         for _metric in scoring.keys():
             mean = float(best[f"mean_test_{_metric}"])
             std = float(best[f"std_test_{_metric}"])
-            live.log_metric(f"cross_val/{_metric}", mean, plot=False)
-            live.log_metric(f"cross_val/{_metric}-std", std, plot=False)
-            live.log_metric(
-                f"test/{_metric}", scoring[_metric](clf, X_test, y_test), plot=False
-            )
+            log_metric(f"cross_val/{_metric}", mean)
+            log_metric(f"cross_val/{_metric}-std", std)
+            log_metric(f"test/{_metric}", scoring[_metric](clf, X_test, y_test))

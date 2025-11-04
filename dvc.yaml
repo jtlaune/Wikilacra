@@ -1,9 +1,9 @@
 params:
 - params.yaml
 - dvclive/params.yaml
-- dvclive/RF/params.yaml
 - dvclive/XGBT/params.yaml
 - dvclive/LinSVC/params.yaml
+- dvclive/RF/params.yaml
 stages:
   label_data_extract:
     cmd: python pipelines/extract_data_to_label.py 
@@ -49,11 +49,6 @@ stages:
     - outputs/labeled_engineered/${train-RF.input_name}.csv
     - wikilacra/scoring.py
     - wikilacra/data.py
-    outs:
-    - dvclive/RF/metrics.json
-    - dvclive/RF/params.yaml
-    - dvclive/RF/plots/images/FeatureImportances.png
-    - dvclive/RF/plots/images/ConfusionMatrixDisplay.png
   train-XGBT:
     cmd: python pipelines/XGBT.py "outputs/labeled_engineered/" 
       "${train-XGBT.input_name}" ${train-XGBT.metric_name} 
@@ -109,14 +104,14 @@ plots:
 - dvclive/NN/plots/metrics:
     x: step
 - dvclive/NN/plots/images
-- dvclive/RF/plots/images
 - dvclive/XGBT/plots/images
 - dvclive/LinSVC/plots/images
+- dvclive/RF/plots/images
 metrics:
 - dvclive/NN/metrics.json
-- dvclive/RF/metrics.json
 - dvclive/XGBT/metrics.json
 - dvclive/LinSVC/metrics.json
+- dvclive/RF/metrics.json
 artifacts:
   RF-model:
     path: outputs/models/RF-model.pkl
