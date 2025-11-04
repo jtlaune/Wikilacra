@@ -18,7 +18,7 @@ import xgboost as xgb
 from dvclive.live import Live
 
 from wikilacra.scoring import scoring
-from wikilacra.data import create_parameter_grid
+from wikilacra.training import create_parameter_grid
 
 if __name__ == "__main__":
     # Directory of the data

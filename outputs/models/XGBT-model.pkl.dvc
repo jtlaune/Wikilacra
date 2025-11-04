@@ -1,5 +1,5 @@
 outs:
-- md5: 0ce7110bf9d522c04a36f53230e5845f
-  size: 196499
+- md5: e0e67a534dba20235b0b372a38e83843
+  size: 186268
   hash: md5
   path: XGBT-model.pkl

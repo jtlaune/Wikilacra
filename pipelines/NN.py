@@ -22,7 +22,7 @@ from torch import save as torch_save
 from dvclive.live import Live
 
 from wikilacra.scoring import scoring_functions
-from wikilacra.data import train_val_test
+from wikilacra.training import train_val_test
 from wikilacra.scaling import scaler
 
 

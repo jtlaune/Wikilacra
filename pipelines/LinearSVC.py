@@ -19,7 +19,7 @@ from sklearn.preprocessing import StandardScaler, RobustScaler
 from dvclive.live import Live
 
 from wikilacra.scoring import scoring
-from wikilacra.data import create_parameter_grid
+from wikilacra.training import create_parameter_grid
 from wikilacra.scaling import scaler
 
 if __name__ == "__main__":

@@ -25,7 +25,7 @@ from mlflow import (
 from mlflow.sklearn import log_model
 
 from wikilacra.scoring import scoring
-from wikilacra.data import create_parameter_grid
+from wikilacra.training import create_parameter_grid
 
 if __name__ == "__main__":
     set_tracking_uri("http://localhost:5000")
@@ -106,6 +106,7 @@ if __name__ == "__main__":
             "n_estimators": n_estimators,
             "max_depth": max_depths,
         }
+
         # Do time series cross-validation split
         if CV_type == "TimeSeries":
             cv_splitter = TimeSeriesSplit(n_splits=N_fold_cv)
