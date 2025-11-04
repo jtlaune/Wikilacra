@@ -1,7 +1,11 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.14
+#FROM python:3.14
+FROM ghcr.io/mlflow/mlflow:v3.6.0rc0
 
 RUN mkdir /data/
+
+# For building pyarrow for mlflow
+RUN apt-get update && apt-get install -y git
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -12,8 +16,9 @@ ENV PYTHONUNBUFFERED=1
 # Install pip requirements
 COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
-RUN python -m pip install dvc 
 RUN python -m pip install pylint
+RUN python -m pip install optuna
+RUN python -m pip install dvc 
 RUN python -m pip install dvclive[image,plots,sklearn,markdown,torch]
 
 WORKDIR /app
@@ -25,8 +30,10 @@ RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /
 USER appuser
 
 ENV PYTHONPATH=/workspaces/Wikilacra
+ENV MLFLOW_TRACKING_URI=http://localhost:5000
+
+# MLflow Tracking Server
+EXPOSE 5000
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-# Just launch a shell for in case no command given...
-CMD ["/bin/bash"]
-# Default put in by VSCode: ["python", "pipelines/label_training_data.py"]
+CMD mlflow server --backend-store-uri sqlite:////db/mlflow.db --default-artifact-root /db/mlartifacts

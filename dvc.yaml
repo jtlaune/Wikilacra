@@ -1,9 +1,5 @@
 params:
 - params.yaml
-- dvclive/params.yaml
-- dvclive/RF/params.yaml
-- dvclive/XGBT/params.yaml
-- dvclive/LinSVC/params.yaml
 stages:
   label_data_extract:
     cmd: python pipelines/extract_data_to_label.py 
@@ -48,12 +44,8 @@ stages:
     - pipelines/RF.py
     - outputs/labeled_engineered/${train-RF.input_name}.csv
     - wikilacra/scoring.py
-    - wikilacra/data.py
-    outs:
-    - dvclive/RF/metrics.json
-    - dvclive/RF/params.yaml
-    - dvclive/RF/plots/images/FeatureImportances.png
-    - dvclive/RF/plots/images/ConfusionMatrixDisplay.png
+    - wikilacra/training.py
+    - wikilacra/logging.py
   train-XGBT:
     cmd: python pipelines/XGBT.py "outputs/labeled_engineered/" 
       "${train-XGBT.input_name}" ${train-XGBT.metric_name} 
@@ -64,12 +56,8 @@ stages:
     - pipelines/XGBT.py
     - outputs/labeled_engineered/${train-XGBT.input_name}.csv
     - wikilacra/scoring.py
-    - wikilacra/data.py
-    outs:
-    - dvclive/XGBT/metrics.json
-    - dvclive/XGBT/params.yaml
-    - dvclive/XGBT/plots/images/FeatureImportances.png
-    - dvclive/XGBT/plots/images/ConfusionMatrixDisplay.png
+    - wikilacra/training.py
+    - wikilacra/logging.py
   train-LinSVC:
     cmd: python pipelines/LinearSVC.py "outputs/labeled_engineered/" 
       "${train-LinSVC.input_name}" ${train-LinSVC.metric_name} 
@@ -81,12 +69,9 @@ stages:
     - pipelines/LinearSVC.py
     - outputs/labeled_engineered/${train-LinSVC.input_name}.csv
     - wikilacra/scoring.py
-    - wikilacra/data.py
+    - wikilacra/training.py
     - wikilacra/scaling.py
-    outs:
-    - dvclive/LinSVC/metrics.json
-    - dvclive/LinSVC/params.yaml
-    - dvclive/LinSVC/plots/images/ConfusionMatrixDisplay.png
+    - wikilacra/logging.py
   train-NN:
     cmd: python pipelines/NN.py "outputs/labeled_engineered/" 
       "${train-NN.input_name}" ${train-NN.metric_name} ${train-NN.random_state} 
@@ -98,33 +83,6 @@ stages:
     - pipelines/NN.py
     - outputs/labeled_engineered/${train-NN.input_name}.csv
     - wikilacra/scoring.py
-    - wikilacra/data.py
+    - wikilacra/training.py
     - wikilacra/scaling.py
-    outs:
-    - dvclive/NN/metrics.json
-    - dvclive/NN/plots/images/ConfusionMatrixDisplay.png
-    - dvclive/NN/plots/metrics/val
-    - dvclive/NN/plots/metrics/train
-plots:
-- dvclive/NN/plots/metrics:
-    x: step
-- dvclive/NN/plots/images
-- dvclive/RF/plots/images
-- dvclive/XGBT/plots/images
-- dvclive/LinSVC/plots/images
-metrics:
-- dvclive/NN/metrics.json
-- dvclive/RF/metrics.json
-- dvclive/XGBT/metrics.json
-- dvclive/LinSVC/metrics.json
-artifacts:
-  RF-model:
-    path: outputs/models/RF-model.pkl
-  XGBT-model:
-    path: outputs/models/XGBT-model.pkl
-  LinSVC-model:
-    path: outputs/models/LinSVC-model.pkl
-  NN-model:
-    path: outputs/models/NN-model.pt
-  NN-model-state:
-    path: outputs/models/NN-model-state.pt
+    - wikilacra/logging.py
