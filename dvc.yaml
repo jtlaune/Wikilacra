@@ -49,6 +49,7 @@ stages:
     - outputs/labeled_engineered/${train-RF.input_name}.csv
     - wikilacra/scoring.py
     - wikilacra/training.py
+    - wikilacra/logging.py
   train-XGBT:
     cmd: python pipelines/XGBT.py "outputs/labeled_engineered/" 
       "${train-XGBT.input_name}" ${train-XGBT.metric_name} 
@@ -60,11 +61,7 @@ stages:
     - outputs/labeled_engineered/${train-XGBT.input_name}.csv
     - wikilacra/scoring.py
     - wikilacra/training.py
-    outs:
-    - dvclive/XGBT/metrics.json
-    - dvclive/XGBT/params.yaml
-    - dvclive/XGBT/plots/images/FeatureImportances.png
-    - dvclive/XGBT/plots/images/ConfusionMatrixDisplay.png
+    - wikilacra/logging.py
   train-LinSVC:
     cmd: python pipelines/LinearSVC.py "outputs/labeled_engineered/" 
       "${train-LinSVC.input_name}" ${train-LinSVC.metric_name} 
@@ -78,10 +75,6 @@ stages:
     - wikilacra/scoring.py
     - wikilacra/training.py
     - wikilacra/scaling.py
-    outs:
-    - dvclive/LinSVC/metrics.json
-    - dvclive/LinSVC/params.yaml
-    - dvclive/LinSVC/plots/images/ConfusionMatrixDisplay.png
   train-NN:
     cmd: python pipelines/NN.py "outputs/labeled_engineered/" 
       "${train-NN.input_name}" ${train-NN.metric_name} ${train-NN.random_state} 
