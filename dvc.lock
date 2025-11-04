@@ -60,8 +60,8 @@ stages:
       size: 451528
     - path: pipelines/RF.py
       hash: md5
-      md5: 89895630f392dd0adfc36b5db6ab4fde
-      size: 4081
+      md5: bb343a8e25a7de53d8d5a1d91ca6ee47
+      size: 4068
     - path: wikilacra/logging.py
       hash: md5
       md5: f0566a9927a4eb4f00f17d694b0b29b0
@@ -127,8 +127,8 @@ stages:
       size: 451528
     - path: pipelines/XGBT.py
       hash: md5
-      md5: 584823435b2b88168cbe46f49ffda42e
-      size: 3031
+      md5: f90bf9d6892c8720f5a24711bb81fdb2
+      size: 3459
     - path: wikilacra/logging.py
       hash: md5
       md5: f0566a9927a4eb4f00f17d694b0b29b0
@@ -152,8 +152,12 @@ stages:
       size: 451528
     - path: pipelines/LinearSVC.py
       hash: md5
-      md5: e34d4a6770970e32eece9540c67b36d5
-      size: 3877
+      md5: f24bee1d13135a1b3521edb32b44327e
+      size: 4349
+    - path: wikilacra/logging.py
+      hash: md5
+      md5: f0566a9927a4eb4f00f17d694b0b29b0
+      size: 1707
     - path: wikilacra/scaling.py
       hash: md5
       md5: 0bee0af26a263554c6abfe0c658ed234
@@ -176,8 +180,12 @@ stages:
       size: 451528
     - path: pipelines/NN.py
       hash: md5
-      md5: 686379d50d29a7bdb127403c0fc11f2d
-      size: 7802
+      md5: e7f53929932341c32b1ed7af72b04ba7
+      size: 8728
+    - path: wikilacra/logging.py
+      hash: md5
+      md5: f0566a9927a4eb4f00f17d694b0b29b0
+      size: 1707
     - path: wikilacra/scaling.py
       hash: md5
       md5: 0bee0af26a263554c6abfe0c658ed234
@@ -190,22 +198,3 @@ stages:
       hash: md5
       md5: 5fd9bcd1911dfdd43bf23666427f573e
       size: 2669
-    outs:
-    - path: dvclive/NN/metrics.json
-      hash: md5
-      md5: b60ba200d3589881a942b9b69c4d12f9
-      size: 596
-    - path: dvclive/NN/plots/images/ConfusionMatrixDisplay.png
-      hash: md5
-      md5: 66ef372c6392ec70a5b140171b6eaa95
-      size: 15777
-    - path: dvclive/NN/plots/metrics/train
-      hash: md5
-      md5: fbae70c466966706c47f1c89364fa435.dir
-      size: 219
-      nfiles: 1
-    - path: dvclive/NN/plots/metrics/val
-      hash: md5
-      md5: 54dde0e06f0cf481dc3918462a1d9c72.dir
-      size: 218
-      nfiles: 1

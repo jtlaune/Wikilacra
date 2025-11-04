@@ -6,14 +6,11 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV, train_test_split
 
-from mlflow import (
-    set_tracking_uri,
-    start_run,
-)
-
 from wikilacra.scoring import scoring
 from wikilacra.training import create_parameter_grid, get_cv_splitter
 from wikilacra.logging import log_sklearn
+
+from mlflow import set_tracking_uri, start_run
 
 if __name__ == "__main__":
     set_tracking_uri("http://localhost:5000")
