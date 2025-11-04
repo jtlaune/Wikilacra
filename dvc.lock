@@ -60,22 +60,33 @@ stages:
       size: 451528
     - path: pipelines/RF.py
       hash: md5
-      md5: 740d2c318569d3bdd858cfa4fdf56f94
-      size: 5175
+      md5: f4052afdc164491e795b4692ceb41020
+      size: 5448
     - path: wikilacra/data.py
       hash: md5
-      md5: 4bf22571bcb58f9a706af6fe4cbba34b
-      size: 1964
+      md5: 22f318628b1e1c2ac35a2f1c85d11230
+      size: 1984
     - path: wikilacra/scoring.py
       hash: md5
       md5: 9f7e8e3491fb727a57a8ed643f12fb07
       size: 1453
     outs:
-    - path: dvclive/RF/
+    - path: dvclive/RF/metrics.json
       hash: md5
-      md5: 374b487ca03c48974ebef32c64cf5da9.dir
-      size: 85832
-      nfiles: 22
+      md5: 5892c4f59c6c098349eb052e05f91b83
+      size: 754
+    - path: dvclive/RF/params.yaml
+      hash: md5
+      md5: 78366c671aae9dab399054734fd7396a
+      size: 32
+    - path: dvclive/RF/plots/images/ConfusionMatrixDisplay.png
+      hash: md5
+      md5: 7f2a673b98c1a0efbe4f5b3649806610
+      size: 15429
+    - path: dvclive/RF/plots/images/FeatureImportances.png
+      hash: md5
+      md5: a36458ddaed20bb59d8576861a46363b
+      size: 68950
   features:
     cmd: python pipelines/engineer-features.py 6 1Min 10 
       "inputs/label_data/2025-08.enwiki.2025-08.tsv" 
@@ -129,22 +140,33 @@ stages:
       size: 451528
     - path: pipelines/XGBT.py
       hash: md5
-      md5: 9bf8cdc97a8ebd9ce66a5e58d753059b
-      size: 4593
+      md5: 871a6b89d511090ee3edf76aa018f3cf
+      size: 4821
     - path: wikilacra/data.py
       hash: md5
-      md5: 4bf22571bcb58f9a706af6fe4cbba34b
-      size: 1964
+      md5: 22f318628b1e1c2ac35a2f1c85d11230
+      size: 1984
     - path: wikilacra/scoring.py
       hash: md5
       md5: 9f7e8e3491fb727a57a8ed643f12fb07
       size: 1453
     outs:
-    - path: dvclive/XGBT/
+    - path: dvclive/XGBT/metrics.json
       hash: md5
-      md5: 96814a0742a9b7738984e28607b54007.dir
-      size: 87528
-      nfiles: 22
+      md5: 28c95895ccd579e33a15b359deab1fc8
+      size: 752
+    - path: dvclive/XGBT/params.yaml
+      hash: md5
+      md5: 69b024339360517cf9c844d7e87dd09d
+      size: 13
+    - path: dvclive/XGBT/plots/images/ConfusionMatrixDisplay.png
+      hash: md5
+      md5: 344582dfb9dee32a74a7685c054102f9
+      size: 16820
+    - path: dvclive/XGBT/plots/images/FeatureImportances.png
+      hash: md5
+      md5: eb47826bb606e00952c6c5378c9699d2
+      size: 68622
   train-LinSVC:
     cmd: python pipelines/LinearSVC.py "outputs/labeled_engineered/" 
       "engineered_aug25" f1 4583 2 0.2 KFold 5 standard 1 "(0.001,100,6,'geom')"
@@ -156,12 +178,12 @@ stages:
       size: 451528
     - path: pipelines/LinearSVC.py
       hash: md5
-      md5: f5a0f3f0079b0f0d3e1e1e6e2fa5f081
-      size: 5217
+      md5: 920b89896926bcdb535118d073911221
+      size: 5459
     - path: wikilacra/data.py
       hash: md5
-      md5: 4bf22571bcb58f9a706af6fe4cbba34b
-      size: 1964
+      md5: 22f318628b1e1c2ac35a2f1c85d11230
+      size: 1984
     - path: wikilacra/scaling.py
       hash: md5
       md5: 0bee0af26a263554c6abfe0c658ed234
@@ -171,14 +193,21 @@ stages:
       md5: 9f7e8e3491fb727a57a8ed643f12fb07
       size: 1453
     outs:
-    - path: dvclive/LinSVC/
+    - path: dvclive/LinSVC/metrics.json
       hash: md5
-      md5: a967a5761fa51f7434f4ed62ce51cba8.dir
-      size: 18180
-      nfiles: 21
+      md5: 88600c532a9395897c20b7944fe6bdc4
+      size: 749
+    - path: dvclive/LinSVC/params.yaml
+      hash: md5
+      md5: 3a56e105077de0f5647c590f7904b9e1
+      size: 37
+    - path: dvclive/LinSVC/plots/images/ConfusionMatrixDisplay.png
+      hash: md5
+      md5: 00a4c9661bf2bbdf8c2ffa309e868055
+      size: 16783
   train-NN:
     cmd: python pipelines/NN.py "outputs/labeled_engineered/" "engineered_aug25"
-      f1 4583 2 0.2 standard 0.01 0.0 3 64 ReLU 300 3
+      f1 4583 2 0.2 0.1 standard 0.0001 0.2 2 8 ReLU 10 3
     deps:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
@@ -186,12 +215,12 @@ stages:
       size: 451528
     - path: pipelines/NN.py
       hash: md5
-      md5: 5f3872fd9b52ef55b1d321cb030ff4cb
-      size: 6473
+      md5: 68cd137483820b37c3967653f246f485
+      size: 7798
     - path: wikilacra/data.py
       hash: md5
-      md5: 4bf22571bcb58f9a706af6fe4cbba34b
-      size: 1964
+      md5: 22f318628b1e1c2ac35a2f1c85d11230
+      size: 1984
     - path: wikilacra/scaling.py
       hash: md5
       md5: 0bee0af26a263554c6abfe0c658ed234
@@ -201,8 +230,21 @@ stages:
       md5: 9f7e8e3491fb727a57a8ed643f12fb07
       size: 1453
     outs:
-    - path: dvclive/NN/
+    - path: dvclive/NN/metrics.json
       hash: md5
-      md5: 8e37415e99eb3bef0c1d424f9df08a85.dir
-      size: 31807
-      nfiles: 10
+      md5: b60ba200d3589881a942b9b69c4d12f9
+      size: 596
+    - path: dvclive/NN/plots/images/ConfusionMatrixDisplay.png
+      hash: md5
+      md5: 66ef372c6392ec70a5b140171b6eaa95
+      size: 15777
+    - path: dvclive/NN/plots/metrics/train
+      hash: md5
+      md5: fbae70c466966706c47f1c89364fa435.dir
+      size: 219
+      nfiles: 1
+    - path: dvclive/NN/plots/metrics/val
+      hash: md5
+      md5: 54dde0e06f0cf481dc3918462a1d9c72.dir
+      size: 218
+      nfiles: 1

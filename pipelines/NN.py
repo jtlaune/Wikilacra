@@ -1,24 +1,28 @@
 import os
 import sys
 from ast import literal_eval
-import pandas as pd
-from matplotlib.pyplot import subplots
+from random import seed as random_seed
 
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-from sklearn.model_selection import train_test_split
+import pandas as pd
+
+from numpy import float32
+from numpy.random import seed as np_random_seed
+
+from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.preprocessing import StandardScaler, RobustScaler
 
 from torch import nn, tensor, no_grad, sigmoid
 from torch.utils.data import TensorDataset, DataLoader
 from torch.cuda import is_available as cuda_is_available
 from torch.optim import Adam
-
-from numpy import float32
+from torch import manual_seed as torch_manual_seed
+from torch import use_deterministic_algorithms
+from torch import save as torch_save
 
 from dvclive.live import Live
 
 from wikilacra.scoring import scoring_functions
-from wikilacra.data import create_parameter_grid
+from wikilacra.data import train_val_test
 from wikilacra.scaling import scaler
 
 
@@ -74,18 +78,31 @@ if __name__ == "__main__":
     random_state = int(sys.argv[4])
     # Number of concurrent jobs for cross-validation grid search
     n_jobs = int(sys.argv[5])
-    # Proportion of test data to be held out
-    test_prop = float(sys.argv[6])
+    # Proportion of test data to be held out for validation
+    val_prop = float(sys.argv[6])
+    # Proportion of test data to be held out for test
+    test_prop = float(sys.argv[7])
     # Scaler type to apply after the custom scaling (see wikilacra.scaling)
-    scale_type = str(sys.argv[7])
+    scale_type = str(sys.argv[8])
+    # Learning rate
+    lr = float(sys.argv[9])
+    # Dropout rate after each layer
+    dropout = float(sys.argv[10])
+    # Number of hidden layers
+    N_hidden = int(sys.argv[11])
+    # Size of the hidden layers
+    size_hidden = int(sys.argv[12])
+    # Activation function for every layer
+    activation = str(sys.argv[13])
+    # Number of training epochs
+    epochs = int(sys.argv[14])
+    # Weight for positive classes
+    pos_weight = float(sys.argv[15])
 
-    lr = float(sys.argv[8])
-    dropout = float(sys.argv[9])
-    N_hidden = int(sys.argv[10])
-    size_hidden = int(sys.argv[11])
-    activation = str(sys.argv[12])
-    epochs = int(sys.argv[13])
-    pos_weight = float(sys.argv[14])
+    torch_manual_seed(random_state)
+    np_random_seed(random_state)
+    random_seed(random_state)
+    use_deterministic_algorithms(True)
 
     # Load the engineered and cleaned features
     engineered = pd.read_csv(
@@ -118,19 +135,21 @@ if __name__ == "__main__":
 
     # Split the test set off, shuffle=False which means we're getting the last
     # entries in test
-    X_scaled, X_scaled_test, y, y_test = train_test_split(
-        X_scaled, y, test_size=test_prop, shuffle=False
+    X_scaled, X_scaled_val, X_scaled_test, y, y_val, y_test = train_val_test(
+        X_scaled, y, val_prop, test_prop, False
     )
 
     X_train_t = tensor(X_scaled.astype(float32))
     Y_train_t = tensor(y.astype(float32).to_numpy())
+    X_val_t = tensor(X_scaled_val.astype(float32))
+    Y_val_t = tensor(y_val.astype(float32).to_numpy())
     X_test_t = tensor(X_scaled_test.astype(float32))
     Y_test_t = tensor(y_test.astype(float32).to_numpy())
 
     event_train = TensorDataset(X_train_t, Y_train_t)
-    event_test = TensorDataset(X_test_t, Y_test_t)
+    event_val = TensorDataset(X_val_t, Y_val_t)
     train_loader = DataLoader(event_train, batch_size=64)
-    test_loader = DataLoader(event_test, batch_size=64)
+    val_loader = DataLoader(event_val, batch_size=64)
 
     device = "cuda" if cuda_is_available() else "cpu"
     event_model = EventsModel(
@@ -143,9 +162,9 @@ if __name__ == "__main__":
 with Live("dvclive/NN/") as live:
     for i in range(epochs):
         # --- train ---
+        event_model.train()
         train_loss = 0.0
         for xb, yb in train_loader:
-            event_model.train()
             xb, yb = xb.to(device), yb.to(device)
             logits = event_model(xb)
             loss = loss_function(logits, yb.squeeze(1))
@@ -158,28 +177,42 @@ with Live("dvclive/NN/") as live:
         train_loss /= len(train_loader.dataset)
         live.log_metric("train/loss", train_loss)
 
-        # --- eval: test error rate ---
+        # --- eval: val error rate ---
         event_model.eval()
-        test_loss = 0.0
+        val_loss = 0.0
         with no_grad():
-            for xt, yt in test_loader:
+            for xt, yt in val_loader:
                 xt, yt = xt.to(device), yt.to(device)
                 logits = event_model(xt)
-                test_loss += loss_function(logits, yt.squeeze(1)).item() * yt.size(0)
+                val_loss += loss_function(logits, yt.squeeze(1)).item() * yt.size(0)
 
-        # --- log test loss to DVCLive ---
-        test_loss /= len(test_loader.dataset)
-        live.log_metric("test/loss", test_loss)
+        # --- log val loss to DVCLive ---
+        val_loss /= len(val_loader.dataset)
+        live.log_metric("val/loss", val_loss)
         live.next_step()  # step == epoch index
 
+    # --- log val metrics ---
+    event_model.eval()
+    with no_grad():
+        logits = event_model(X_val_t)
+    val_preds = (sigmoid(logits) >= 0.5) * 1
+    for _metric in scoring_functions.keys():
+        score = scoring_functions[_metric](y_val, val_preds)
+        live.log_metric(f"val/{_metric}", score, plot=False)
+
+    # --- log test metrics ---
     event_model.eval()
     with no_grad():
         logits = event_model(X_test_t)
     test_preds = (sigmoid(logits) >= 0.5) * 1
-
     for _metric in scoring_functions.keys():
         score = scoring_functions[_metric](y_test, test_preds)
-        live.log_metric(f"test/{_metric}", score)
+        live.log_metric(f"test/{_metric}", score, plot=False)
+
+    torch_save(event_model, "outputs/models/NN-model.pt")
+    torch_save(event_model.state_dict(), "outputs/models/NN-model-state.pt")
+    live.log_artifact("outputs/models/NN-model.pt", name="NN-model")
+    live.log_artifact("outputs/models/NN-model-state.pt", name="NN-model-state")
 
     # Confusion matrix on the test data
     fCMD = ConfusionMatrixDisplay.from_predictions(

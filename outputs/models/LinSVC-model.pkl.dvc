@@ -1,0 +1,5 @@
+outs:
+- md5: 8e0f2de349c50e21a28d3a02c64d9d1c
+  size: 9612
+  hash: md5
+  path: LinSVC-model.pkl
