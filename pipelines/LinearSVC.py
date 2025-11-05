@@ -14,9 +14,9 @@ from sklearn.preprocessing import StandardScaler, RobustScaler
 from wikilacra.scoring import scoring
 from wikilacra.training import create_parameter_grid, get_cv_splitter
 from wikilacra.scaling import scaler
-from wikilacra.logging import log_sklearn
+from wikilacra.logging import log_sklearn_metrics
 
-from mlflow import start_run, set_tracking_uri
+from mlflow import start_run, set_tracking_uri, log_params
 
 if __name__ == "__main__":
     set_tracking_uri("http://localhost:5000")
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         else:
             C = literal_eval(sys.argv[11])
         loss = literal_eval(sys.argv[12])
-    
+
         # Load the engineered and cleaned features
         engineered = pd.read_csv(
             os.path.join(engineered_dir, engineered_basename + ".csv"), index_col=0
@@ -66,15 +66,17 @@ if __name__ == "__main__":
         # X is the exog cols, y is the endog cols
         X = engineered[exog_cols]
         y = engineered[endog_cols].astype(int)
-    
+
         # Split the test set off, shuffle=False which means we're getting the last
         # entries in test
-        X, X_test, y, y_test = train_test_split(X, y, test_size=test_prop, shuffle=False)
-    
+        X, X_test, y, y_test = train_test_split(
+            X, y, test_size=test_prop, shuffle=False
+        )
+
         # Custom scaler function from wikilacra.scaling that handles the count and
         # slope data. New features should be manually added there.
         count_slope_scaling = FunctionTransformer(scaler)
-    
+
         # Normalization scaling from sklearn
         if scale_type == "standard":
             norm_scaler = StandardScaler()
@@ -82,7 +84,7 @@ if __name__ == "__main__":
             norm_scaler = RobustScaler()
         else:
             raise Warning(f"scale-type options are [standard,robust], not {scale_type}")
-    
+
         # Classifier and pipeline. Pipeline is necessary for cross validation consistency.
         svc = LinearSVC()
         pipe = Pipeline(
@@ -93,20 +95,20 @@ if __name__ == "__main__":
             ]
         )
         # Parameter grid. Parameters for the pipeline are prefixed with "[stepname]__"
-        print(C)
         parameters = {
             "svc__C": C,
             "svc__loss": loss,
         }
-    
+
         # Get cross validation splitter
         cv_splitter = get_cv_splitter(CV_type, N_fold_cv, random_state=random_state)
-    
+
         # Grid search, optimizing for the refit metric
         clf = GridSearchCV(
             pipe, parameters, cv=cv_splitter, scoring=scoring, refit=metric_name
         )
         clf.fit(X, y.values.ravel())
-    
-        log_sklearn(clf, X_test, y_test, metric_name)
-    
+
+        # Log to MLflow
+        log_params({"CV_" + key: val for key, val in parameters.items()})
+        log_sklearn_metrics(clf, X_test, y_test, metric_name)

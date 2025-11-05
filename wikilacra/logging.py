@@ -15,7 +15,7 @@ from mlflow.sklearn import log_model
 from wikilacra.scoring import scoring
 
 
-def log_sklearn(clf, X_test, y_test, metric_name):
+def log_sklearn_metrics(clf, X_test, y_test, metric_name):
     # Confusion matrix on the test data
     fCMD = ConfusionMatrixDisplay.from_estimator(
         clf,

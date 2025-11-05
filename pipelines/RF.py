@@ -8,9 +8,9 @@ from sklearn.model_selection import GridSearchCV, train_test_split
 
 from wikilacra.scoring import scoring
 from wikilacra.training import create_parameter_grid, get_cv_splitter
-from wikilacra.logging import log_sklearn
+from wikilacra.logging import log_sklearn_metrics
 
-from mlflow import set_tracking_uri, start_run
+from mlflow import set_tracking_uri, start_run, log_params
 
 if __name__ == "__main__":
     set_tracking_uri("http://localhost:5000")
@@ -105,4 +105,6 @@ if __name__ == "__main__":
         )
         clf.fit(X, y.values.ravel())
 
-        log_sklearn(clf, X_test, y_test, metric_name)
+        # Log to MLflow
+        log_params({"CV_" + key: val for key, val in parameters.items()})
+        log_sklearn_metrics(clf, X_test, y_test, metric_name)
