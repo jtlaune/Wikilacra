@@ -60,8 +60,8 @@ stages:
       size: 451528
     - path: pipelines/RF.py
       hash: md5
-      md5: ee8e8f64ad3f9c119ef2819b060bbc1e
-      size: 4194
+      md5: c2abf9cbd51620cd8292d85a89350eee
+      size: 4339
     - path: wikilacra/logging.py
       hash: md5
       md5: ccbd94c94805c2c8f7805d75bc304ccc
@@ -127,8 +127,8 @@ stages:
       size: 451528
     - path: pipelines/XGBT.py
       hash: md5
-      md5: ec0c919ec1427730afd02ae62d6fa7ae
-      size: 3585
+      md5: a29916d65ecce59fadf232eb94b3ced0
+      size: 3732
     - path: wikilacra/logging.py
       hash: md5
       md5: ccbd94c94805c2c8f7805d75bc304ccc
@@ -152,8 +152,8 @@ stages:
       size: 451528
     - path: pipelines/LinearSVC.py
       hash: md5
-      md5: 538c0299a5ea6548d47670a37533dbbc
-      size: 4444
+      md5: 9f21c9ed9d5c6c8cee115b66aa750e46
+      size: 4593
     - path: wikilacra/logging.py
       hash: md5
       md5: ccbd94c94805c2c8f7805d75bc304ccc
@@ -180,8 +180,8 @@ stages:
       size: 451528
     - path: pipelines/NN.py
       hash: md5
-      md5: e7f53929932341c32b1ed7af72b04ba7
-      size: 8728
+      md5: addd4d5841af00385e8e1d2e958dfb49
+      size: 8873
     - path: wikilacra/logging.py
       hash: md5
       md5: ccbd94c94805c2c8f7805d75bc304ccc

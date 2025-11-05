@@ -12,6 +12,8 @@ from wikilacra.logging import log_sklearn_metrics
 
 from mlflow import set_tracking_uri, start_run, log_params
 
+from dvc.api import params_show
+
 if __name__ == "__main__":
     set_tracking_uri("http://localhost:5000")
     with start_run():
@@ -106,5 +108,8 @@ if __name__ == "__main__":
         clf.fit(X, y.values.ravel())
 
         # Log to MLflow
+        log_params(
+            {"dvc_" + key: val for key, val in params_show()["train-RF"].items()}
+        )
         log_params({"CV_" + key: val for key, val in parameters.items()})
         log_sklearn_metrics(clf, X_test, y_test, metric_name)

@@ -30,6 +30,8 @@ from mlflow import (
 )
 from mlflow.pytorch import log_model
 
+from dvc.api import params_show
+
 from wikilacra.scoring import scoring_functions
 from wikilacra.training import train_val_test
 from wikilacra.scaling import scaler
@@ -244,3 +246,7 @@ if __name__ == "__main__":
         ).figure_
 
         log_figure(fCMD, "ConfusionMatrixDisplay.png")
+
+        log_params(
+            {"dvc_" + key: val for key, val in params_show()["train-NN"].items()}
+        )
