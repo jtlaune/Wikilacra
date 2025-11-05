@@ -11,16 +11,17 @@ from sklearn.model_selection import (
 from sklearn.pipeline import Pipeline, FunctionTransformer
 from sklearn.preprocessing import StandardScaler, RobustScaler
 
+from mlflow import start_run, set_tracking_uri, log_params, set_experiment
+
+from dvc.api import params_show
+
 from wikilacra.scoring import scoring
 from wikilacra.training import create_parameter_grid, get_cv_splitter
 from wikilacra.scaling import scaler
 from wikilacra.logging import log_sklearn_metrics
 
-from mlflow import start_run, set_tracking_uri, log_params
-
-from dvc.api import params_show
-
 if __name__ == "__main__":
+    set_experiment("DVC")
     set_tracking_uri("http://localhost:5000")
     with start_run():
         # Directory of the data

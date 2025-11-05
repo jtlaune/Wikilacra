@@ -36,4 +36,4 @@ ENV MLFLOW_TRACKING_URI=http://localhost:5000
 EXPOSE 5000
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD mlflow server --backend-store-uri sqlite:////db/mlflow.db --default-artifact-root /db/mlartifacts
+CMD mlflow server --backend-store-uri sqlite:////db/mlflow.db --artifacts-destination /db/mlartifacts --serve-artifacts

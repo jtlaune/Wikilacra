@@ -27,6 +27,7 @@ from mlflow import (
     log_params,
     log_metric,
     log_figure,
+    set_experiment,
 )
 from mlflow.pytorch import log_model
 
@@ -80,6 +81,7 @@ class EventsModel(nn.Module):
 
 if __name__ == "__main__":
     set_tracking_uri("http://localhost:5000")
+    set_experiment("DVC")
     with start_run():
         # Directory of the data
         engineered_dir = str(sys.argv[1])
