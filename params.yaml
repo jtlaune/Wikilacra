@@ -14,13 +14,13 @@ features:
   intra_win: 10
 train-RF:
   input_name: engineered_aug25
-  metric_name: f1
-  random_state: 4583
+  metric_name: accuracy
+  random_state: 4829
   n_jobs: 2
   max_depths_gen: 1
   max_depths: (1,10,10,'lin')
   n_estimators_gen: 0
-  n_estimators: (200,500)
+  n_estimators: (100,200,300,400,500)
   test_prop: 0.2
   CV_type: KFold
   N_fold_cv: 5

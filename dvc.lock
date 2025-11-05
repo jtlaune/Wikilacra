@@ -52,7 +52,7 @@ stages:
       size: 201160
   train-RF:
     cmd: python pipelines/RF.py "outputs/labeled_engineered/" "engineered_aug25"
-      f1 4583 2 1 "(1,10,10,'lin')" 0 "(200,500)" 0.2 KFold 5
+      accuracy 4829 2 1 "(1,10,10,'lin')" 0 "(100,200,300,400,500)" 0.2 KFold 5
     deps:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
