@@ -1,14 +1,17 @@
 """
-Helper functions for (simple) feature engineering/data cleaning. More involved
-engineering/manipulation is put into a respective pipeline.
+Helper functions for training models in pipelines.
 
-clean_for_training: drop columns that are commonly unused
-engineer_common_training: engineer common features, e.g. taking the logarithm of
-                          page share
+train_val_test: split into training, validation, and test set.
+
+create_parameter_grid: Create a geometrically or linearly spaced grid of
+parameters.
+
+get_cv_splitter: create a cv_splitter based on options typically passed from the
+command line
 """
 
 from numpy import linspace, geomspace
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, KFold, TimeSeriesSplit
 
 
 def train_val_test(X, y, val_prop, test_prop, shuffle):
@@ -54,3 +57,18 @@ def create_parameter_grid(x1, x2, n, spacing, dtype):
         return [dtype(x) for x in _]
     else:
         raise Warning(f"parameter grid type is [geom,lin], not {spacing}")
+
+
+def get_cv_splitter(CV_type, N_fold_cv, random_state=None):
+    """Do time series cross-validation split or k-fold cross-validation split
+    based on CV_type. N_fold_cv sets the number of folds. random_state is unused
+    if TimeSeriesSplit."""
+    if CV_type == "TimeSeries":
+        if random_state is not None:
+            print("Warning... random_state is unused since you are using a TimeSeriesSplit")
+        cv_splitter = TimeSeriesSplit(n_splits=N_fold_cv)
+    elif CV_type == "KFold":
+        cv_splitter = KFold(n_splits=N_fold_cv, shuffle=True, random_state=random_state)
+    else:
+        raise Warning("Supported CV_type: TimeSeries, KFold")
+    return cv_splitter
