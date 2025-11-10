@@ -154,7 +154,6 @@ if __name__ == "__main__":
     # Percentages
     engineered[
         [
-            "anon_revs_pct",
             "perm_revs_pct",
             "revert_revs_pct",
             "minor_revs_pct",
@@ -165,7 +164,6 @@ if __name__ == "__main__":
         ]
     ] = X[
         [
-            "anon_cnt",
             "perm_cnt",
             "revert_cnt",
             "minor_cnt",
@@ -305,7 +303,7 @@ if __name__ == "__main__":
     ##########################
     # Get useful column sets #
     ##########################
-    drop_cols = ["anon_revs_pct"]  # collinear with perm_revs_pct by definition
+    drop_cols = []  
     engineered = engineered.drop(columns=drop_cols)
 
     cat_cols = {

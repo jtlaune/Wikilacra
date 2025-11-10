@@ -114,7 +114,6 @@ def get_page_quants(df, bin_pd):
         ]
     ).agg(
         user_rev_cnt=("event_timestamp", "count"),
-        user_anon_cnt=("event_user_is_anonymous", "sum"),
         user_perm_cnt=("event_user_is_permanent_clean", "sum"),
         user_revert_cnt=("revision_is_identity_revert", "sum"),
         user_minor_rev_cnt=("revision_minor_edit", "sum"),
@@ -132,7 +131,6 @@ def get_page_quants(df, bin_pd):
         rev_cnt=("user_rev_cnt", "sum"),
         user_cnt=("user_rev_cnt", "count"),
         max_cnt_user=("user_rev_cnt", "max"),
-        anon_cnt=("user_anon_cnt", "sum"),
         perm_cnt=("user_perm_cnt", "sum"),
         revert_cnt=("user_revert_cnt", "sum"),
         minor_cnt=("user_minor_rev_cnt", "sum"),
@@ -152,7 +150,6 @@ def get_page_quants(df, bin_pd):
     )
 
     # Normalizing bool sum columns
-    dt_page["anon_cnt"] = dt_page["anon_cnt"] * 1
     dt_page["perm_cnt"] = dt_page["perm_cnt"] * 1
     dt_page["revert_cnt"] = dt_page["revert_cnt"] * 1
     dt_page["minor_cnt"] = dt_page["minor_cnt"] * 1
