@@ -74,6 +74,9 @@ RECENTCHANGE_COLS = [
     "revision_new",
 ]
 
+REVISIONCREATE_COLS = [
+    
+]
 
 def flush_batch(
     connection: Connection,
