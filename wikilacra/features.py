@@ -117,7 +117,6 @@ def get_page_quants(df, bin_pd):
         user_perm_cnt=("event_user_is_permanent_clean", "sum"),
         user_revert_cnt=("revision_is_identity_revert", "sum"),
         user_minor_rev_cnt=("revision_minor_edit", "sum"),
-        page_creation=("page_creation_timestamp", "first"),
         user_rev_diff_bytes_tot=("revision_text_bytes_diff", "sum"),
         user_rev_bytes_tot=("revision_text_bytes", "sum"),
         user_mob_edit=("rev_mobile_edit", "sum"),
@@ -134,7 +133,6 @@ def get_page_quants(df, bin_pd):
         perm_cnt=("user_perm_cnt", "sum"),
         revert_cnt=("user_revert_cnt", "sum"),
         minor_cnt=("user_minor_rev_cnt", "sum"),
-        page_creation=("page_creation", "first"),
         rev_diff_bytes_total=("user_rev_diff_bytes_tot", "sum"),
         rev_bytes_total=("user_rev_bytes_tot", "sum"),
         mob_edits=("user_mob_edit", "sum"),
@@ -143,11 +141,6 @@ def get_page_quants(df, bin_pd):
     )
 
     dt_page = dt_page.reset_index()
-    dt_page["hrs_since_page_creation"] = (
-        dt_page["event_timestamp"]
-        + pd.Timedelta("1h")
-        - pd.to_datetime(dt_page["page_creation"])
-    )
 
     # Normalizing bool sum columns
     dt_page["perm_cnt"] = dt_page["perm_cnt"] * 1

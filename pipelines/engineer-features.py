@@ -79,7 +79,7 @@ if __name__ == "__main__":
         "1h",
     )
     # Numerical columns selection (for rolling, lagged, expwin, and intracounts)
-    num_cols = list(set(counts.columns) - {"page_creation", "hrs_since_page_creation"})
+    num_cols = list(set(counts.columns))
     # Rolling & exponential windows
     roll, expwin = compute_windows(counts, rolling_avg_hrs, num_cols)
     # Lags and slopes
@@ -177,19 +177,6 @@ if __name__ == "__main__":
     )
     engineered["page_share_cur"] = engineered["rev_cnt_cur"].div(
         engineered["rev_vol_cur"], axis=0
-    )
-
-    #################
-    # Page creation #
-    #################
-    engineered["older_1day"] = 1 * (
-        X["hrs_since_page_creation"] >= pd.to_timedelta("1day")
-    )
-    engineered["older_8hrs"] = 1 * (
-        X["hrs_since_page_creation"] >= pd.to_timedelta("8h")
-    )
-    engineered["older_2hrs"] = 1 * (
-        X["hrs_since_page_creation"] >= pd.to_timedelta("2h")
     )
 
     #####################
@@ -303,13 +290,10 @@ if __name__ == "__main__":
     ##########################
     # Get useful column sets #
     ##########################
-    drop_cols = []  
+    drop_cols = []
     engineered = engineered.drop(columns=drop_cols)
 
     cat_cols = {
-        "older_1day",
-        "older_2hrs",
-        "older_8hrs",
         "cur_yr_in_title",
     }
     num_cols = list(

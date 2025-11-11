@@ -30,9 +30,6 @@ def scaler(df):
     scaled["minor_revs_pct"] = scaled["minor_revs_pct"]
     scaled["mob_revs_pct"] = scaled["mob_revs_pct"]
     scaled["num_pages_cur"] = log1p(scaled["num_pages_cur"])
-    scaled["older_1day"] = scaled["older_1day"].astype(int)
-    scaled["older_2hrs"] = scaled["older_2hrs"].astype(int)
-    scaled["older_8hrs"] = scaled["older_8hrs"].astype(int)
     scaled["page_ent_cur"] = scaled["page_ent_cur"]
     scaled["page_share_cur"] = log1p(scaled["page_share_cur"])
     scaled["perm_revs_pct"] = scaled["perm_revs_pct"]
