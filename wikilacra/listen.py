@@ -11,36 +11,6 @@ register_adapter(list, lambda x: json.dumps(x, ensure_ascii=False))
 
 HEADERS = {"User-Agent": "Wikilacra/0.1 (https://jtlaune.github.io; jtlaune@gmail.com)"}
 
-RECENTTAGS_COLS = [
-    "schema",
-    "database",
-    "page_id",
-    "page_title",
-    "page_namespace",
-    "rev_id",
-    "rev_timestamp",
-    "rev_sha1",
-    "rev_minor_edit",
-    "rev_len",
-    "rev_content_model",
-    "rev_content_format",
-    "page_is_redirect",
-    "comment",
-    "parsedcomment",
-    "rev_parent_id",
-    "tags",
-    "meta_uri",
-    "meta_request_id",
-    "meta_id",
-    "meta_domain",
-    "meta_stream",
-    "meta_dt",
-    "meta_topic",
-    "meta_partition",
-    "meta_offset",
-    "prior_state_tags",
-]
-
 RECENTCHANGE_COLS = [
     "schema",
     "id",
@@ -74,9 +44,72 @@ RECENTCHANGE_COLS = [
     "revision_new",
 ]
 
-REVISIONCREATE_COLS = [
-    
+RECENTTAGS_COLS = [
+    "schema",
+    "database",
+    "page_id",
+    "page_title",
+    "page_namespace",
+    "rev_id",
+    "rev_timestamp",
+    "rev_sha1",
+    "rev_minor_edit",
+    "rev_len",
+    "rev_content_model",
+    "rev_content_format",
+    "page_is_redirect",
+    "comment",
+    "parsedcomment",
+    "rev_parent_id",
+    "tags",
+    "meta_uri",
+    "meta_request_id",
+    "meta_id",
+    "meta_domain",
+    "meta_stream",
+    "meta_dt",
+    "meta_topic",
+    "meta_partition",
+    "meta_offset",
+    "prior_state_tags",
 ]
+
+REVISIONCREATE_COLS = [
+    "schema",
+    "database",
+    "page_id",
+    "page_title",
+    "page_namespace",
+    "rev_id",
+    "rev_timestamp",
+    "rev_sha1",
+    "rev_minor_edit",
+    "rev_len",
+    "rev_content_model",
+    "rev_content_format",
+    "page_is_redirect",
+    "comment",
+    "parsedcomment",
+    "rev_parent_id",
+    "dt",
+    "rev_content_changed",
+    "meta_uri",
+    "meta_request_id",
+    "meta_id",
+    "meta_domain",
+    "meta_stream",
+    "meta_dt",
+    "meta_topic",
+    "meta_partition",
+    "meta_offset",
+    "performer_user_text",
+    "performer_user_groups",
+    "performer_user_is_bot",
+    "performer_user_id",
+    "performer_user_registration_dt",
+    "performer_user_edit_count",
+]
+
 
 def flush_batch(
     connection: Connection,
@@ -103,6 +136,15 @@ def recentchange_filter(data: Dict[str, Any]) -> bool:
         and not data.get("bot")
         and data.get("namespace") == 0
         and (data.get("type") == "edit" or data.get("type") == "new")
+    )
+
+
+def revisioncreate_filter(data: Dict[str, Any]) -> bool:
+    meta = data.get("meta")
+    return (
+        meta.get("domain") == "en.wikipedia.org"
+        and data.get("user_is_bot") != "1"
+        and data.get("page_namespace") == 0
     )
 
 
@@ -153,7 +195,7 @@ def stream_listen(
                         flush_batch(con, batch, table, columns)
                         batch = []
                         batch_num += 1
-                        print(f"batch={batch_num}", end="\r")
+                        print(f"batch={batch_num}")
 
         except InvalidStatusCodeError:
             # pass
@@ -177,24 +219,25 @@ def create_tables(filename: str) -> None:
     con = connect(filename)
     con.execute(
         """
-        CREATE TABLE IF NOT EXISTS recentchange (
+        CREATE TABLE IF NOT EXISTS revisioncreate (
          schema TEXT,
-         id INT,
-         type TEXT,
-         namespace INT,
-         title TEXT,
-         title_url TEXT,
+         database TEXT,
+         page_id INT,
+         page_title TEXT,
+         page_namespace INT,
+         rev_id INT,
+         rev_timestamp TEXT,
+         rev_sha1 TEXT,
+         rev_minor_edit TEXT,
+         rev_len INT,
+         rev_content_model TEXT,
+         rev_content_format TEXT,
+         page_is_redirect TET,
          comment TEXT,
-         timestamp TEXT,
-         user TEXT,
-         bot TEXT,
-         notify_url TEXT,
-         minor TEXT,
-         server_url TEXT,
-         server_name TEXT,
-         server_script_path TEXT,
-         wiki TEXT,
          parsedcomment TEXT,
+         rev_parent_id INT,
+         dt TEXT,
+         rev_content_changed TEXT,
          meta_uri TEXT,
          meta_request_id TEXT,
          meta_id TEXT,
@@ -204,10 +247,12 @@ def create_tables(filename: str) -> None:
          meta_topic TEXT,
          meta_partition INT,
          meta_offset INT,
-         length_old INT,
-         length_new INT,
-         revision_old INT,
-         revision_new INT
+         performer_user_text TEXT,
+         performer_user_groups TEXT,
+         performer_user_is_bot TEXT,
+         performer_user_id INT,
+         performer_user_registration_dt TEXT,
+         performer_user_edit_count INT
         );
         """
     )
@@ -241,6 +286,42 @@ def create_tables(filename: str) -> None:
          meta_partition INT,
          meta_offset INT,
          prior_state_tags TEXT
+        );
+        """
+    )
+    con.execute(
+        """
+        CREATE TABLE IF NOT EXISTS recentchange (
+         schema TEXT,
+         id INT,
+         type TEXT,
+         namespace INT,
+         title TEXT,
+         title_url TEXT,
+         comment TEXT,
+         timestamp TEXT,
+         user TEXT,
+         bot TEXT,
+         notify_url TEXT,
+         minor TEXT,
+         server_url TEXT,
+         server_name TEXT,
+         server_script_path TEXT,
+         wiki TEXT,
+         parsedcomment TEXT,
+         meta_uri TEXT,
+         meta_request_id TEXT,
+         meta_id TEXT,
+         meta_domain TEXT,
+         meta_stream TEXT,
+         meta_dt TEXT,
+         meta_topic TEXT,
+         meta_partition INT,
+         meta_offset INT,
+         length_old INT,
+         length_new INT,
+         revision_old INT,
+         revision_new INT
         );
         """
     )
