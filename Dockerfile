@@ -3,6 +3,7 @@
 FROM ghcr.io/mlflow/mlflow:v3.6.0rc0
 
 RUN mkdir /data/
+RUN mkdir -p /workspaces/Wikilacra/
 
 # For building pyarrow for mlflow
 RUN apt-get update && apt-get install -y git
@@ -21,12 +22,9 @@ RUN python -m pip install optuna
 RUN python -m pip install dvc 
 RUN python -m pip install dvclive[image,plots,sklearn,markdown,torch]
 
-WORKDIR /app
-COPY . /app
-
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
-RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app && chown -R appuser /data
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /workspaces/Wikilacra && chown -R appuser /data
 USER appuser
 
 ENV PYTHONPATH=/workspaces/Wikilacra
