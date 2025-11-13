@@ -2,7 +2,7 @@ import os, subprocess, time
 from datetime import datetime, timezone
 import pytz
 
-dt = datetime.strptime("2025-11-11 03:00:00", "%Y-%m-%d %H:%M:%S")
+dt = datetime.strptime("2025-11-12 18:00:00", "%Y-%m-%d %H:%M:%S")
 local_tz = pytz.timezone("America/Chicago")
 dt_local = local_tz.localize(dt)
 dt_utc = dt_local.astimezone(timezone.utc)
