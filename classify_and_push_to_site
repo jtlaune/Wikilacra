@@ -1,0 +1,13 @@
+#!/bin/bash
+cd "$WIKILACRA_DIR"
+source ./env
+docker compose up classifier
+cd "$BUILD_WEBSITE_DIR"
+npm run build
+cd "$DIST_WEBSITE_DIR"
+cp -R "$BUILD_WEBSITE_DIR"/dist/* .
+timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+git add .
+git commit -m "Deploy $timestamp"
+git push
+cd "$WIKILACRA_DIR"

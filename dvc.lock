@@ -56,8 +56,8 @@ stages:
     deps:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
-      md5: 5d7b32c55ce38a5a90dc247105be7eaa
-      size: 451528
+      md5: 9e7d9815d4dd551cedda73baed3b9af4
+      size: 445147
     - path: pipelines/RF.py
       hash: md5
       md5: a2a942afb35b81d11aff2e206545818b
@@ -90,16 +90,16 @@ stages:
       size: 202664
     - path: pipelines/engineer-features.py
       hash: md5
-      md5: 692204179020127dc1a9b7688cd13875
-      size: 10163
+      md5: 8cdda1b47d15b022fe21756877201e08
+      size: 4499
     - path: wikilacra/__init__.py
       hash: md5
       md5: 2cfe281f7badd3ca0379b6c582aeaab1
       size: 2399
     - path: wikilacra/features.py
       hash: md5
-      md5: 98063e865d7c751df6c25343cea6dbf6
-      size: 7642
+      md5: 587399ae4143dedb6d08e641280ca9ba
+      size: 12724
     - path: wikilacra/stream.py
       hash: md5
       md5: 9d9de9cf07d0cf268151fe9348b0a590
@@ -107,24 +107,24 @@ stages:
     outs:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
-      md5: 5d7b32c55ce38a5a90dc247105be7eaa
-      size: 451528
+      md5: 9e7d9815d4dd551cedda73baed3b9af4
+      size: 445147
     - path: outputs/labeled_engineered/engineered_aug25_endog_cols.txt
       hash: md5
       md5: 70bfdfd148a0b5bb84cee643cff64de2
       size: 10
     - path: outputs/labeled_engineered/engineered_aug25_exog_cols.txt
       hash: md5
-      md5: fe2285c3e60df5ae33c0e84ffc40e383
-      size: 662
+      md5: 50df06e60bd482d9f815874c76968e60
+      size: 620
   train-XGBT:
     cmd: python pipelines/XGBT.py "outputs/labeled_engineered/" 
       "engineered_aug25" f1 4583 2 1 "(1,10,10,'lin')" 0.2 KFold 5
     deps:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
-      md5: 5d7b32c55ce38a5a90dc247105be7eaa
-      size: 451528
+      md5: 9e7d9815d4dd551cedda73baed3b9af4
+      size: 445147
     - path: pipelines/XGBT.py
       hash: md5
       md5: 3dcf9ac2bd54052c70dff6bfb8444273
@@ -148,8 +148,8 @@ stages:
     deps:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
-      md5: 5d7b32c55ce38a5a90dc247105be7eaa
-      size: 451528
+      md5: 9e7d9815d4dd551cedda73baed3b9af4
+      size: 445147
     - path: pipelines/LinearSVC.py
       hash: md5
       md5: d7f25b07aa100325bb162621fb65ef5c
@@ -160,8 +160,8 @@ stages:
       size: 1715
     - path: wikilacra/scaling.py
       hash: md5
-      md5: 0bee0af26a263554c6abfe0c658ed234
-      size: 2879
+      md5: 91a2b26050ea311cf27364ecb4ba88dd
+      size: 2699
     - path: wikilacra/scoring.py
       hash: md5
       md5: 9f7e8e3491fb727a57a8ed643f12fb07
@@ -176,8 +176,8 @@ stages:
     deps:
     - path: outputs/labeled_engineered/engineered_aug25.csv
       hash: md5
-      md5: 5d7b32c55ce38a5a90dc247105be7eaa
-      size: 451528
+      md5: 9e7d9815d4dd551cedda73baed3b9af4
+      size: 445147
     - path: pipelines/NN.py
       hash: md5
       md5: 5aff200e89b07adb4e0d4b7c60a1c197
@@ -188,8 +188,8 @@ stages:
       size: 1715
     - path: wikilacra/scaling.py
       hash: md5
-      md5: 0bee0af26a263554c6abfe0c658ed234
-      size: 2879
+      md5: 91a2b26050ea311cf27364ecb4ba88dd
+      size: 2699
     - path: wikilacra/scoring.py
       hash: md5
       md5: 9f7e8e3491fb727a57a8ed643f12fb07

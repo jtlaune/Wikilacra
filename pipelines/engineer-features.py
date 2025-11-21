@@ -14,6 +14,7 @@ from wikilacra.features import (
     compute_windows,
     get_lagged_and_slopes,
     compute_intracounts_stats,
+    coalesce_select,
 )
 from wikilacra.stream import read_data_chunked
 
@@ -79,7 +80,7 @@ if __name__ == "__main__":
         "1h",
     )
     # Numerical columns selection (for rolling, lagged, expwin, and intracounts)
-    num_cols = list(set(counts.columns) - {"page_creation", "hrs_since_page_creation"})
+    num_cols = list(set(counts.columns))
     # Rolling & exponential windows
     roll, expwin = compute_windows(counts, rolling_avg_hrs, num_cols)
     # Lags and slopes
@@ -93,13 +94,6 @@ if __name__ == "__main__":
     CLASSES = ["EVENT", "EDIT_WAR", "VANDALISM", "NONE", "MOVED_OR_DELETED"]
 
     engineered = labels.copy()
-    # Select the date range, ensuring event_timestamp is a datetime (otherwise
-    # it will default to lexicographical)
-    engineered["event_timestamp"] = pd.to_datetime(engineered["event_timestamp"])
-    engineered = engineered[
-        (engineered["event_timestamp"] >= start_dt)
-        & (engineered["event_timestamp"] <= end_dt)
-    ]
 
     # Drop typo-labeled data
     to_drop = engineered[
@@ -118,227 +112,18 @@ if __name__ == "__main__":
     engineered = engineered[["event_timestamp", "page_title", "target"]]
     engineered = engineered.reset_index(drop=True)
 
-    ###########
-    # Globals #
-    ###########
-    X = dt_glob.loc[engineered["event_timestamp"]].reset_index(drop=True)
-    engineered[["num_pages_cur", "page_ent_cur", "rev_vol_cur"]] = X[
-        ["num_pages", "page_ent", "rev_vol"]
-    ]
-    engineered["avg_rev_per_page_cur"] = engineered["rev_vol_cur"].div(
-        engineered["num_pages_cur"], axis=0
+    exog_cols, endog_cols, engineered = coalesce_select(
+        engineered,
+        start_dt,
+        end_dt,
+        dt_glob,
+        dt_page,
+        slopes,
+        lags,
+        roll,
+        expwin,
+        intracounts,
     )
-
-    #############
-    # Page data #
-    #############
-    X = dt_page.loc[
-        pd.MultiIndex.from_frame(engineered[["event_timestamp", "page_title"]])
-    ].reset_index(drop=True)
-    engineered[
-        [
-            "rev_cnt_cur",
-            "user_count_cur",
-            "user_ent_cur",
-            "max_user_edits_cur",
-        ]
-    ] = X[
-        [
-            "rev_cnt",
-            "user_cnt",
-            "user_ent",
-            "max_cnt_user",
-        ]
-    ]
-
-    # Percentages
-    engineered[
-        [
-            "anon_revs_pct",
-            "perm_revs_pct",
-            "revert_revs_pct",
-            "minor_revs_pct",
-            "web_mob_revs_pct",
-            "mob_revs_pct",
-            "rev_diff_avg_bytes",
-            "rev_avg_bytes_tot",
-        ]
-    ] = X[
-        [
-            "anon_cnt",
-            "perm_cnt",
-            "revert_cnt",
-            "minor_cnt",
-            "web_mob_edits",
-            "mob_edits",
-            "rev_diff_bytes_total",
-            "rev_bytes_total",
-        ]
-    ].divide(
-        X["rev_cnt"], axis=0
-    )
-    engineered["page_share_cur"] = engineered["rev_cnt_cur"].div(
-        engineered["rev_vol_cur"], axis=0
-    )
-
-    #################
-    # Page creation #
-    #################
-    engineered["older_1day"] = 1 * (
-        X["hrs_since_page_creation"] >= pd.to_timedelta("1day")
-    )
-    engineered["older_8hrs"] = 1 * (
-        X["hrs_since_page_creation"] >= pd.to_timedelta("8h")
-    )
-    engineered["older_2hrs"] = 1 * (
-        X["hrs_since_page_creation"] >= pd.to_timedelta("2h")
-    )
-
-    #####################
-    # Page title string #
-    #####################
-    engineered["cur_yr_in_title"] = engineered["page_title"].str.contains(
-        str(pd.Timestamp.now().year)
-    )
-
-    ######################
-    # Exponential Window #
-    ######################
-    X = expwin.loc[
-        pd.MultiIndex.from_frame(engineered[["page_title", "event_timestamp"]])
-    ].reset_index(drop=True)
-    engineered[
-        [
-            "ema_count_mean",
-            "ema_count_var",
-        ]
-    ] = X[
-        [
-            ("rev_cnt", "mean"),
-            ("rev_cnt", "var"),
-        ]
-    ]
-
-    ##########
-    # Slopes #
-    ##########
-    X = slopes.loc[
-        pd.MultiIndex.from_frame(engineered[["event_timestamp", "page_title"]])
-    ].reset_index(drop=True)
-    engineered[
-        [
-            "count_1hr_slope",
-            "count_2hr_slope",
-            "count_3hr_slope",
-        ]
-    ] = X[
-        [
-            "slope1_rev_cnt",
-            "slope2_rev_cnt",
-            "slope3_rev_cnt",
-        ]
-    ]
-
-    ########
-    # Lags #
-    ########
-    X = lags.loc[
-        pd.MultiIndex.from_frame(engineered[["event_timestamp", "page_title"]])
-    ].reset_index(drop=True)
-    engineered[
-        [
-            "count_1hr_lag",
-            "count_2hr_lag",
-            "count_3hr_lag",
-        ]
-    ] = X[
-        [
-            "lag1_rev_cnt",
-            "lag2_rev_cnt",
-            "lag3_rev_cnt",
-        ]
-    ]
-
-    ###########
-    # Rolling #
-    ###########
-    X = roll.loc[
-        pd.MultiIndex.from_frame(engineered[["page_title", "event_timestamp"]])
-    ].reset_index(drop=True)
-    engineered[
-        [
-            "roll_count_mean",
-            "roll_count_var",
-            "roll_count_skew",
-            "roll_count_kurt",
-            "roll_user_ent_mean",
-            "roll_user_count_mean",
-            "roll_revert_count_mean",
-        ]
-    ] = X[
-        [
-            ("rev_cnt", "mean"),
-            ("rev_cnt", "var"),
-            ("rev_cnt", "skew"),
-            ("rev_cnt", "kurt"),
-            ("user_ent", "mean"),
-            ("user_cnt", "mean"),
-            ("revert_cnt", "mean"),
-        ]
-    ]
-
-    ###############
-    # Intracounts #
-    ###############
-    X = (
-        intracounts.set_index(["event_timestamp", "page_title"])
-        .loc[pd.MultiIndex.from_frame(engineered[["event_timestamp", "page_title"]])]
-        .reset_index(drop=True)
-    )
-    engineered["max_burst_cur"] = X["max_burst_score"]
-
-    #######################################
-    # Drop NaNs from rolling windows, etc #
-    #######################################
-    engineered = engineered[~engineered.isna().any(axis=1)]
-
-    ##########################
-    # Get useful column sets #
-    ##########################
-    drop_cols = ["anon_revs_pct"]  # collinear with perm_revs_pct by definition
-    engineered = engineered.drop(columns=drop_cols)
-
-    cat_cols = {
-        "older_1day",
-        "older_2hrs",
-        "older_8hrs",
-        "cur_yr_in_title",
-    }
-    num_cols = list(
-        set(engineered.columns)
-        - {
-            "event_timestamp",
-            "target",
-            "page_title",
-        }
-        - cat_cols
-    )
-    cat_cols = list(cat_cols)
-    exog_cols = list(
-        set(engineered.columns)
-        - {
-            "event_timestamp",
-            "page_title",
-            "target",
-        }
-    )
-    endog_cols = ["target"]
-
-    ##########
-    # Typing #
-    ##########
-    engineered[num_cols] = engineered[num_cols].astype("float")
-    engineered[cat_cols] = engineered[cat_cols].astype("category")
 
     # Save to directory output_dir with filename output_basename.csv
     engineered.to_csv(os.path.join(output_dir, output_basename + ".csv"))

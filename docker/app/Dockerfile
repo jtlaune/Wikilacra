@@ -1,0 +1,30 @@
+# For more information, please refer to https://aka.ms/vscode-docker-python
+FROM ghcr.io/mlflow/mlflow:v3.6.0rc0
+
+WORKDIR /app
+
+# For building pyarrow for mlflow
+RUN apt-get update && apt-get install -y git
+
+
+COPY requirements.txt .
+RUN python -m pip install --no-cache-dir -r requirements.txt
+
+COPY wikilacra ./wikilacra
+COPY services ./services
+COPY outputs/labeled_engineered/engineered_aug25_exog_cols.txt ./engineered_aug25_exog_cols.txt
+
+RUN mkdir /app/logs/
+
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+# Creates a non-root user with an explicit UID and adds permission to access the /app folder
+# For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
+
+# During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
+CMD ["bash"]

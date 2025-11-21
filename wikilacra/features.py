@@ -114,11 +114,9 @@ def get_page_quants(df, bin_pd):
         ]
     ).agg(
         user_rev_cnt=("event_timestamp", "count"),
-        user_anon_cnt=("event_user_is_anonymous", "sum"),
         user_perm_cnt=("event_user_is_permanent_clean", "sum"),
         user_revert_cnt=("revision_is_identity_revert", "sum"),
         user_minor_rev_cnt=("revision_minor_edit", "sum"),
-        page_creation=("page_creation_timestamp", "first"),
         user_rev_diff_bytes_tot=("revision_text_bytes_diff", "sum"),
         user_rev_bytes_tot=("revision_text_bytes", "sum"),
         user_mob_edit=("rev_mobile_edit", "sum"),
@@ -132,11 +130,9 @@ def get_page_quants(df, bin_pd):
         rev_cnt=("user_rev_cnt", "sum"),
         user_cnt=("user_rev_cnt", "count"),
         max_cnt_user=("user_rev_cnt", "max"),
-        anon_cnt=("user_anon_cnt", "sum"),
         perm_cnt=("user_perm_cnt", "sum"),
         revert_cnt=("user_revert_cnt", "sum"),
         minor_cnt=("user_minor_rev_cnt", "sum"),
-        page_creation=("page_creation", "first"),
         rev_diff_bytes_total=("user_rev_diff_bytes_tot", "sum"),
         rev_bytes_total=("user_rev_bytes_tot", "sum"),
         mob_edits=("user_mob_edit", "sum"),
@@ -145,14 +141,8 @@ def get_page_quants(df, bin_pd):
     )
 
     dt_page = dt_page.reset_index()
-    dt_page["hrs_since_page_creation"] = (
-        dt_page["event_timestamp"]
-        + pd.Timedelta("1h")
-        - pd.to_datetime(dt_page["page_creation"])
-    )
 
     # Normalizing bool sum columns
-    dt_page["anon_cnt"] = dt_page["anon_cnt"] * 1
     dt_page["perm_cnt"] = dt_page["perm_cnt"] * 1
     dt_page["revert_cnt"] = dt_page["revert_cnt"] * 1
     dt_page["minor_cnt"] = dt_page["minor_cnt"] * 1
@@ -230,3 +220,230 @@ def get_lagged_and_slopes(df, N_lags, cols):
         axis=1,
     )
     return df_lags, slopes
+
+
+def coalesce_select(
+    engineered,
+    start_dt,
+    end_dt,
+    dt_glob,
+    dt_page,
+    slopes,
+    lags,
+    roll,
+    expwin,
+    intracounts,
+):
+    # Select the date range, ensuring event_timestamp is a datetime (otherwise
+    # it will default to lexicographical)
+    engineered["event_timestamp"] = pd.to_datetime(engineered["event_timestamp"])
+    engineered = engineered[
+        (engineered["event_timestamp"] >= start_dt)
+        & (engineered["event_timestamp"] <= end_dt)
+    ]
+
+    ###########
+    # Globals #
+    ###########
+    X = dt_glob.loc[engineered["event_timestamp"]].reset_index(drop=True)
+    engineered[["num_pages_cur", "page_ent_cur", "rev_vol_cur"]] = X[
+        ["num_pages", "page_ent", "rev_vol"]
+    ]
+    engineered["avg_rev_per_page_cur"] = engineered["rev_vol_cur"].div(
+        engineered["num_pages_cur"], axis=0
+    )
+
+    #############
+    # Page data #
+    #############
+    X = dt_page.loc[
+        pd.MultiIndex.from_frame(engineered[["event_timestamp", "page_title"]])
+    ].reset_index(drop=True)
+    engineered[
+        [
+            "rev_cnt_cur",
+            "user_count_cur",
+            "user_ent_cur",
+            "max_user_edits_cur",
+        ]
+    ] = X[
+        [
+            "rev_cnt",
+            "user_cnt",
+            "user_ent",
+            "max_cnt_user",
+        ]
+    ]
+
+    # Percentages
+    engineered[
+        [
+            "perm_revs_pct",
+            "revert_revs_pct",
+            "minor_revs_pct",
+            "web_mob_revs_pct",
+            "mob_revs_pct",
+            "rev_diff_avg_bytes",
+            "rev_avg_bytes_tot",
+        ]
+    ] = X[
+        [
+            "perm_cnt",
+            "revert_cnt",
+            "minor_cnt",
+            "web_mob_edits",
+            "mob_edits",
+            "rev_diff_bytes_total",
+            "rev_bytes_total",
+        ]
+    ].divide(
+        X["rev_cnt"], axis=0
+    )
+    engineered["page_share_cur"] = engineered["rev_cnt_cur"].div(
+        engineered["rev_vol_cur"], axis=0
+    )
+
+    #####################
+    # Page title string #
+    #####################
+    engineered["cur_yr_in_title"] = engineered["page_title"].str.contains(
+        str(pd.Timestamp.now().year)
+    )
+
+    ######################
+    # Exponential Window #
+    ######################
+    X = expwin.loc[
+        pd.MultiIndex.from_frame(engineered[["page_title", "event_timestamp"]])
+    ].reset_index(drop=True)
+    engineered[
+        [
+            "ema_count_mean",
+            "ema_count_var",
+        ]
+    ] = X[
+        [
+            ("rev_cnt", "mean"),
+            ("rev_cnt", "var"),
+        ]
+    ]
+
+    ##########
+    # Slopes #
+    ##########
+    X = slopes.loc[
+        pd.MultiIndex.from_frame(engineered[["event_timestamp", "page_title"]])
+    ].reset_index(drop=True)
+    engineered[
+        [
+            "count_1hr_slope",
+            "count_2hr_slope",
+            "count_3hr_slope",
+        ]
+    ] = X[
+        [
+            "slope1_rev_cnt",
+            "slope2_rev_cnt",
+            "slope3_rev_cnt",
+        ]
+    ]
+
+    ########
+    # Lags #
+    ########
+    X = lags.loc[
+        pd.MultiIndex.from_frame(engineered[["event_timestamp", "page_title"]])
+    ].reset_index(drop=True)
+    engineered[
+        [
+            "count_1hr_lag",
+            "count_2hr_lag",
+            "count_3hr_lag",
+        ]
+    ] = X[
+        [
+            "lag1_rev_cnt",
+            "lag2_rev_cnt",
+            "lag3_rev_cnt",
+        ]
+    ]
+
+    ###########
+    # Rolling #
+    ###########
+    X = roll.loc[
+        pd.MultiIndex.from_frame(engineered[["page_title", "event_timestamp"]])
+    ].reset_index(drop=True)
+    engineered[
+        [
+            "roll_count_mean",
+            "roll_count_var",
+            "roll_count_skew",
+            "roll_count_kurt",
+            "roll_user_ent_mean",
+            "roll_user_count_mean",
+            "roll_revert_count_mean",
+        ]
+    ] = X[
+        [
+            ("rev_cnt", "mean"),
+            ("rev_cnt", "var"),
+            ("rev_cnt", "skew"),
+            ("rev_cnt", "kurt"),
+            ("user_ent", "mean"),
+            ("user_cnt", "mean"),
+            ("revert_cnt", "mean"),
+        ]
+    ]
+
+    ###############
+    # Intracounts #
+    ###############
+    X = (
+        intracounts.set_index(["event_timestamp", "page_title"])
+        .loc[pd.MultiIndex.from_frame(engineered[["event_timestamp", "page_title"]])]
+        .reset_index(drop=True)
+    )
+    engineered["max_burst_cur"] = X["max_burst_score"]
+
+    #######################################
+    # Drop NaNs from rolling windows, etc #
+    #######################################
+    engineered = engineered[~engineered.isna().any(axis=1)]
+
+    ##########################
+    # Get useful column sets #
+    ##########################
+    drop_cols = []
+    engineered = engineered.drop(columns=drop_cols)
+
+    cat_cols = {
+        "cur_yr_in_title",
+    }
+    num_cols = list(
+        set(engineered.columns)
+        - {
+            "event_timestamp",
+            "target",
+            "page_title",
+        }
+        - cat_cols
+    )
+    cat_cols = list(cat_cols)
+    exog_cols = list(
+        set(engineered.columns)
+        - {
+            "event_timestamp",
+            "page_title",
+            "target",
+        }
+    )
+    endog_cols = ["target"]
+
+    ##########
+    # Typing #
+    ##########
+    engineered[num_cols] = engineered[num_cols].astype("float")
+    engineered[cat_cols] = engineered[cat_cols].astype("category")
+
+    return exog_cols, endog_cols, engineered
