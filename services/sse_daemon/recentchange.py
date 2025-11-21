@@ -1,15 +1,12 @@
 import sys
-
-sys.path.insert(0, "/workspaces/Wikilacra/")
-import wikilacra.listen
-from wikilacra.listen import RECENTCHANGE_COLS
+from wikilacra.listen import stream_listen, recentchange_filter, RECENTCHANGE_COLS
 
 isodt_start = sys.argv[1]
 
-wikilacra.listen.stream_listen(
+stream_listen(
     f"https://stream.wikimedia.org/v2/stream/recentchange?since={isodt_start}",
-    "test.sqlite",
-    wikilacra.listen.recentchange_filter,
+    "/app/data/db.sqlite",
+    recentchange_filter,
     ["meta", "length", "revision"],
     [],
     RECENTCHANGE_COLS,

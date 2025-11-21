@@ -1,0 +1,50 @@
+services:
+  mlflow:
+    build:
+      context: .
+      dockerfile: docker/mlflow/Dockerfile
+    container_name: wikilacra-mlflow
+    volumes:
+      - "${LOCAL_REMOTE}:/data"
+      - "${MLFLOW_REMOTE}:/db"
+
+  reset-tables:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    container_name: wikilacra-reset-tables
+    command: ["python", "./services/sse_daemon/reset_tables.py"]
+    environment:
+      SSE_DB_PATH: "/app/data/db.sqlite"
+    volumes:
+      - ./sse_data:/app/data
+  daemon:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    container_name: wikilacra-daemon
+    working_dir: /app/services/sse_daemon/
+    command: ["python", "./daemon.py"]
+    environment:
+      SSE_DB_PATH: "/app/data/db.sqlite"
+    volumes:
+      - ./sse_data:/app/data
+      - daemon_logs:/app/logs   # <— named volume
+
+  classifier:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    container_name: wikilacra-classifier
+    command: ["python", "./services/classifier/classify.py"]
+    environment:
+      SSE_DB_PATH: "/app/data/db.sqlite"
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    volumes:
+      - ./sse_data:/app/data
+      - "${JSON_OUTPUT}:/app/output"
+    depends_on:
+      - mlflow
+
+volumes:
+  daemon_logs:

@@ -1,5 +1,4 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-#FROM python:3.14
 FROM ghcr.io/mlflow/mlflow:v3.6.0rc0
 
 RUN mkdir /data/
@@ -34,4 +33,10 @@ ENV MLFLOW_TRACKING_URI=http://localhost:5000
 EXPOSE 5000
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD mlflow server --backend-store-uri sqlite:////db/mlflow.db --artifacts-destination /db/mlartifacts --serve-artifacts
+CMD mlflow server \
+  --backend-store-uri sqlite:////db/mlflow.db \
+  --artifacts-destination /db/mlartifacts \
+  --serve-artifacts \
+  --host 0.0.0.0 \
+  --port 5000 \
+  --allowed-hosts "mlflow:5000,localhost:*"

@@ -143,7 +143,7 @@ def revisioncreate_filter(data: Dict[str, Any]) -> bool:
     meta = data.get("meta")
     return (
         meta.get("domain") == "en.wikipedia.org"
-        and data.get("user_is_bot") != "1"
+        and not data.get("performer")["user_is_bot"]
         and data.get("page_namespace") == 0
     )
 
